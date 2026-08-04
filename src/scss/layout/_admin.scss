@@ -1,0 +1,41 @@
+@use 'base/variables' as *;
+@use 'sass:color';
+
+.turnos {
+    list-style: none;
+    padding: 0;
+
+    li {
+        padding: 1rem;
+        border-top: 1px solid $blanco;
+        margin: 1rem 0;
+
+        p {
+            font-weight: $bold;
+            color: $azul;
+        }
+
+        span,
+        .servicio {
+            font-weight: $regular;
+            color: $blanco;
+        }
+
+        &:hover {
+            background-color: color.scale($gris, $lightness: -80%);
+        }
+    }
+}
+
+.servicios {
+    @extend .turnos;
+
+    .acciones {
+        margin: 0;
+    }
+
+    .boton,
+    .boton-eliminar {
+        margin: 1rem 0;
+    }
+}

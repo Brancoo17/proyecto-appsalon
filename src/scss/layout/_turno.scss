@@ -1,0 +1,78 @@
+@use 'base/variables' as v;
+@use 'base/mixins' as m;
+
+.seccion {
+    padding: 5rem 0;
+    display: none;
+
+    .text-center {
+        text-align: center;
+    }
+
+}
+
+.mostrar {
+    display: block;
+}
+
+.ocultar {
+    display: none;
+}
+
+.listado-horas {
+    width: 100%;
+    @include m.grid(2, 1rem);
+    margin-top: 1rem;
+
+    @include m.tablet {
+        @include m.grid(4, 1rem);
+    }
+}
+
+.hora-boton {
+    background-color: #ffffff;
+    color: #4a5568;
+    border: 2px solid #e2e8f0;
+    padding: 0.8rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.hora-boton:hover:not(:disabled) {
+    background-color: v.$azul;
+    color: #ffffff;
+    border-color: v.$azul;
+}
+
+.hora-boton.seleccionada {
+    background-color: v.$azul;
+    color: #ffffff;
+    border-color: v.$azul;
+}
+
+.hora-boton:disabled {
+    background-color: #f7fafc;
+    color: #cbd5e0;
+    border-color: #e2e8f0;
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+#campo-peluquero {
+    select {
+        width: 100%;
+        padding: 1rem;
+        border: 1px solid v.$gris;
+        border-radius: 0.5rem;
+        font-size: 1.6rem;
+        font-family: inherit;
+        appearance: auto;
+        cursor: pointer;
+        background-color: v.$blanco;
+        color: v.$negro;
+        margin: 2rem 0;
+    }
+}

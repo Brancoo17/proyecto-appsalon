@@ -1,0 +1,22 @@
+{
+    "name": "branco/proyecto-appsalon",
+    "description": "Proyecto PHP 8, MVC, SQL, SASS, Gulp, ActiveRecord",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "MVC\\": "./",
+            "Controllers\\": "./controllers",
+            "Model\\": "./models",
+            "Classes\\": "./classes"
+        }
+    },
+    "authors": [
+        {
+            "name": "Brancoo17",
+            "email": "brancoechazu@gmail.com"
+        }
+    ],
+    "require": {
+        "phpmailer/phpmailer": "^7.1"
+    }
+}

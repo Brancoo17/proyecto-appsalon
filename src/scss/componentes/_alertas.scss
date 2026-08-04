@@ -1,0 +1,22 @@
+@use 'base/variables' as *;
+
+.alerta {
+    padding: calc($separacion / 4);
+    color: $blanco;
+    width: 100%;
+    display: block;
+    margin-bottom: 2rem;
+    font-weight: $bold;
+    text-align: center;
+    text-transform: uppercase;
+    border-radius: 1rem;
+    
+
+    &.error {
+        background-color: $rojo;
+    }
+    &.exito {
+        background-color: $verde;
+    }
+    
+}

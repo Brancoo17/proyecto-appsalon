@@ -1,0 +1,40 @@
+@use 'base/variables' as v;
+
+.contenido-resumen {
+    p {
+        margin-bottom: 1rem;
+    }
+
+    span {
+        color: v.$azul;
+        font-weight: v.$bold;
+        font-size: 2.4rem;
+    }
+}
+
+.contenedor-servicio {
+    padding: 2rem 0;
+    border-bottom: 1px solid v.$gris;   
+
+    &:last-of-type {
+        margin-bottom: v.$separacion;
+    }
+}
+
+.mi-alerta {
+    width: 60rem !important;
+    font-size: 1.8rem;
+}
+
+.mi-alerta .swal2-title {
+    font-size: 3rem;
+}
+
+.mi-alerta .swal2-html-container {
+    font-size: 1.8rem;
+}
+
+.mi-alerta .swal2-confirm {
+    font-size: 1.6rem;
+    padding: 1rem 2rem;
+}
