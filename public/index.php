@@ -9,12 +9,16 @@ use Controllers\APIController;
 use Controllers\AdminController;
 use Controllers\ServicioController;
 use Controllers\PeluqueroController;
+use Controllers\PaginasController;
 
 $router = new Router();
 
-// Login
-$router->get('/', [LoginController::class, 'login']);
-$router->post('/', [LoginController::class, 'login']);
+// Página Principal (Landing Page)
+$router->get('/', [PaginasController::class, 'index']);
+
+// Login & Autenticación
+$router->get('/login', [LoginController::class, 'login']);
+$router->post('/login', [LoginController::class, 'login']);
 $router->get('/logout', [LoginController::class, 'logout']);
 
 // Recuperar Password

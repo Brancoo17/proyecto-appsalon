@@ -6,6 +6,8 @@
 
 <?php include_once __DIR__ . '/../templates/barra.php'; ?>
 
+<a href="/" class="boton-volver"><i class="fa-solid fa-house"></i> Volver a Inicio</a>
+
 <div id="app">
     <nav class="tabs">
         <button class="actual" type="button" data-paso="1">Servicios</button>

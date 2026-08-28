@@ -158,7 +158,7 @@ class LoginController {
                 $resultado = $usuario->guardar();
 
                 if($resultado) {
-                    header('Location: /?resultado=1');
+                    header('Location: /login?resultado=1');
                 }
             }
             

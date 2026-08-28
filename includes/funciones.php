@@ -16,7 +16,7 @@ function s(string $html) : string {
 // Función que revisa que el usuario esté autenticado
 function isAuth() : void {
     if(!isset($_SESSION['login'])) {
-        header('Location: /');
+        header('Location: /login');
     }
 }
 
