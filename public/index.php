@@ -8,6 +8,7 @@ use Controllers\TurnoController;
 use Controllers\APIController;
 use Controllers\AdminController;
 use Controllers\ServicioController;
+use Controllers\PeluqueroController;
 
 $router = new Router();
 
@@ -33,6 +34,17 @@ $router->get('/mensaje', [LoginController::class, 'mensaje']);
 // AREA PRIVADA
 $router->get('/turno', [TurnoController::class, 'index']);
 $router->get('/admin', [AdminController::class, 'index']);
+
+// CRUD de Peluqueros (Solo Administrador)
+$router->get('/peluqueros', [PeluqueroController::class, 'index']);
+$router->get('/peluqueros/crear', [PeluqueroController::class, 'crear']);
+$router->post('/peluqueros/crear', [PeluqueroController::class, 'crear']);
+$router->get('/peluqueros/actualizar', [PeluqueroController::class, 'actualizar']);
+$router->post('/peluqueros/actualizar', [PeluqueroController::class, 'actualizar']);
+$router->post('/peluqueros/eliminar', [PeluqueroController::class, 'eliminar']);
+
+// Panel Privado del Peluquero
+$router->get('/peluquero', [PeluqueroController::class, 'panel']);
 
 // API de Turnos
 $router->get('/api/servicios', [APIController::class, 'index']);

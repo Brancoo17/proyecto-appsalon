@@ -26,6 +26,13 @@ function isAdmin() : void {
     }
 }
 
+// Función que revisa que el peluquero esté autenticado
+function isPeluquero() : void {
+    if(!isset($_SESSION['peluquero'])) {
+        header('Location: /');
+    }
+}
+
 function esUltimo(string $actual, string $proximo) : bool {
 
     if($actual !== $proximo) {

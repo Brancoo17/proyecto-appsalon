@@ -3,7 +3,13 @@
 <?php include_once __DIR__ . '/../templates/barra.php'; ?>
 
 <h1 class="nombre-pagina">Servicios</h1>
-<h3>Administración de Servicios</h3>
+<p class="descripcion-pagina">Administración de Servicios</p>
+
+<div class="acciones">
+    <a class="boton" href="/servicios/crear">Nuevo Servicio</a>
+</div>
+
+<p>Listado de Servicios:</p>
 
 <ul class="servicios">
     <?php foreach($servicios as $servicio): ?>

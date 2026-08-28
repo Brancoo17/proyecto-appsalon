@@ -3,6 +3,7 @@
 namespace Controllers;
 
 use Model\Usuario;
+use Model\Peluquero;
 use MVC\Router;
 use Classes\Email;
 
@@ -19,39 +20,46 @@ class LoginController {
         $auth = new Usuario;
 
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
-            
             $auth = new Usuario($_POST);
-
             $alertas = $auth->validarLogin();
-
             if(empty($alertas)) {
-                // Verificar que el usuario exista
+                // 1. Intentar buscar en tabla 'usuarios'
                 $usuario = Usuario::where('email', $auth->email);
-
                 if($usuario) {
-                    // Verificar el password
+                    // Verificar password de usuario/admin
                     $verificado = $usuario->comprobarPasswordAndVerificado($auth->password);
-                    
                     if($verificado) {
-                        // Autenticar al usuario
                         session_start();
-
                         $_SESSION['id'] = $usuario->id;
                         $_SESSION['nombre'] = $usuario->nombre . " " . $usuario->apellido;
                         $_SESSION['email'] = $usuario->email;
                         $_SESSION['login'] = true;
-
-                        // Redireccionar al usuario
                         if($usuario->admin === 1) {
                             $_SESSION['admin'] = $usuario->admin ?? null;
                             header('Location: /admin');
                         } else {
                             header('Location: /turno');
                         }
+                        return;
                     }
                 } else {
-                    Usuario::setAlerta('error', 'Usuario no encontrado');
-                    $auth->email = '';
+                    // 2. Si no es usuario cliente, buscar en tabla 'peluqueros'
+                    $peluquero = Peluquero::where('email', $auth->email);
+                    if($peluquero) {
+                        if($peluquero->comprobarPassword($auth->password)) {
+                            session_start();
+                            $_SESSION['id'] = $peluquero->id;
+                            $_SESSION['nombre'] = $peluquero->nombre . " " . $peluquero->apellido;
+                            $_SESSION['email'] = $peluquero->email;
+                            $_SESSION['login'] = true;
+                            $_SESSION['peluquero'] = true; // <--- Identificador de rol
+                            header('Location: /peluquero');
+                            return;
+                        }
+                    } else {
+                        Usuario::setAlerta('error', 'Usuario no encontrado');
+                        $auth->email = '';
+                    }
                 }
             }
         }
