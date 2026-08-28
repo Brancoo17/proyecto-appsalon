@@ -1,5 +1,6 @@
 <?php /** @var string $nombre */ ?>
-<?php /** @var int $id */ ?>
+<?php /** @var string $telefono */ ?>
+<?php /** @var int|string $id */ ?>
 
 <h1 class="nombre-pagina">Crear Nuevo Turno</h1>
 <p class="descripcion-pagina">Elige tus servicios y coloca tus datos</p>
@@ -28,7 +29,12 @@
         <form class="formulario">
             <div class="campo">
                 <label for="nombre">Nombre:</label>
-                <input type="text" id="nombre" placeholder="Tu Nombre" value="<?php echo s($nombre) ?>" disabled />
+                <input type="text" id="nombre" placeholder="Tu Nombre completo" value="<?php echo s($nombre) ?>" <?php echo !empty($id) ? 'disabled' : ''; ?> />
+            </div>
+
+            <div class="campo">
+                <label for="telefono">Teléfono:</label>
+                <input type="tel" id="telefono" placeholder="Tu Teléfono de contacto" value="<?php echo s($telefono ?? '') ?>" <?php echo (!empty($id) && !empty($telefono)) ? 'disabled' : ''; ?> />
             </div>
 
             <div class="campo">

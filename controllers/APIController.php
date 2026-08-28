@@ -6,13 +6,12 @@ use Model\Servicio;
 use Model\Turno;
 use Model\Peluquero;
 use Model\TurnoServicio;
+use Model\Usuario;
 
 class APIController {
 
     public static function index() {
-        
         $servicios = Servicio::all();
-
         echo json_encode($servicios);
     }
 
@@ -52,6 +51,43 @@ class APIController {
     }
 
     public static function guardar() {
+        $usuario_id = $_POST['usuario_id'] ?? null;
+        $nombre = $_POST['nombre'] ?? '';
+        $telefono = $_POST['telefono'] ?? '';
+
+        // Si no viene usuario_id o está vacío (es un turno de invitado)
+        if(empty($usuario_id)) {
+            $usuarioExistente = null;
+
+            // Buscar si ya existe un cliente con ese teléfono
+            if(!empty($telefono)) {
+                $usuarioExistente = Usuario::where('telefono', $telefono);
+            }
+
+            if($usuarioExistente) {
+                $usuario_id = $usuarioExistente->id;
+            } else {
+                // Crear un registro rápido en la tabla usuarios para el invitado
+                $partesNombre = explode(' ', trim($nombre), 2);
+                $nombreP = $partesNombre[0] ?? 'Invitado';
+                $apellidoP = $partesNombre[1] ?? '';
+
+                $nuevoUsuario = new Usuario([
+                    'nombre' => $nombreP,
+                    'apellido' => $apellidoP,
+                    'telefono' => $telefono,
+                    'email' => '',
+                    'password' => '',
+                    'admin' => 0,
+                    'confirmado' => 1
+                ]);
+
+                $resUsuario = $nuevoUsuario->guardar();
+                $usuario_id = $resUsuario['id'] ?? null;
+            }
+
+            $_POST['usuario_id'] = $usuario_id;
+        }
 
         // Almacena el turno en la base de datos y devuelve el id
         $turno = new Turno($_POST);

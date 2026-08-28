@@ -5,6 +5,7 @@ const pasoFinal = 3;
 const turno = {
     id: '',
     nombre: '',
+    telefono: '',
     fecha: '',
     hora: '',
     servicios: [],
@@ -28,6 +29,7 @@ function iniciarApp() {
 
     idCliente();
     nombreCliente(); // Añade el nombre del cliente al objeto de turno
+    telefonoCliente(); // Añade el teléfono del cliente al objeto de turno
     seleccionarFecha(); // Añade la fecha del turno en el objeto
     seleccionarPeluquero(); // Escucha cambios en el select
     seleccionarHora(); // Añade la hora del turno en el objeto
@@ -173,11 +175,28 @@ function seleccionarServicio(servicio) {
 }
 
 function idCliente() {
-    turno.id = document.querySelector('#id').value;
+    const inputId = document.querySelector('#id');
+    turno.id = inputId ? inputId.value : '';
 }
 
 function nombreCliente() {
-    turno.nombre = document.querySelector('#nombre').value;
+    const inputNombre = document.querySelector('#nombre');
+    if(inputNombre) {
+        turno.nombre = inputNombre.value;
+        inputNombre.addEventListener('input', function(e) {
+            turno.nombre = e.target.value.trim();
+        });
+    }
+}
+
+function telefonoCliente() {
+    const inputTelefono = document.querySelector('#telefono');
+    if(inputTelefono) {
+        turno.telefono = inputTelefono.value;
+        inputTelefono.addEventListener('input', function(e) {
+            turno.telefono = e.target.value.trim();
+        });
+    }
 }
 
 function seleccionarFecha() {
@@ -228,6 +247,7 @@ function llenarSelectPeluqueros(peluqueros) {
         option.textContent = `${peluquero.nombre} ${peluquero.apellido}`;
         option.dataset.nombre = peluquero.nombre;
         option.dataset.apellido = peluquero.apellido;
+        option.dataset.telefono = peluquero.telefono;
         select.appendChild(option);
     });
 }
@@ -241,7 +261,8 @@ function seleccionarPeluquero() {
         turno.peluquero = {
             id: peluqueroId,
             nombre: opcionSeleccionada.dataset.nombre,
-            apellido: opcionSeleccionada.dataset.apellido
+            apellido: opcionSeleccionada.dataset.apellido,
+            telefono: opcionSeleccionada.dataset.telefono
         };
         // Resetear la hora al cambiar de peluquero
         turno.hora = '';
@@ -365,14 +386,15 @@ function mostrarResumen() {
         resumen.removeChild(resumen.firstChild);
     }
 
-    if(Object.values(turno).includes('') || turno.servicios.length === 0 || !turno.peluquero) {
-        mostrarAlerta('Faltan datos de Servicios, Fecha, Peluquero u Hora', 'error', '.contenido-resumen', false);
+    const { nombre, telefono, fecha, hora, servicios, peluquero } = turno;
+
+    if(!nombre || !telefono || !fecha || !hora || !peluquero || servicios.length === 0) {
+        mostrarAlerta('Faltan datos de Nombre, Teléfono, Servicios, Fecha, Peluquero u Hora', 'error', '.contenido-resumen', false);
 
         return;
     }
 
     // Construir el resumen
-    const { nombre, fecha, hora, servicios } = turno;
 
     // Heading para Servicios en Resumen
     const headingServicios = document.createElement('H3');
@@ -405,7 +427,10 @@ function mostrarResumen() {
     const nombreCliente = document.createElement('P');
     nombreCliente.innerHTML = `<span>Nombre: </span> ${nombre}`;
 
-    // NUEVO: Mostrar peluquero en el resumen
+    const telefonoCliente = document.createElement('P');
+    telefonoCliente.innerHTML = `<span>Teléfono: </span> ${telefono}`;
+
+    // Mostrar peluquero en el resumen
     const peluqueroTurno = document.createElement('P');
     peluqueroTurno.innerHTML = `<span>Peluquero: </span> ${turno.peluquero.nombre} ${turno.peluquero.apellido}`;
 
@@ -440,6 +465,7 @@ function mostrarResumen() {
     botonReservar.onclick = reservarTurno;
 
     resumen.appendChild(nombreCliente);
+    resumen.appendChild(telefonoCliente);
     resumen.appendChild(peluqueroTurno);
     resumen.appendChild(fechaTurno);
     resumen.appendChild(horaTurno);
@@ -449,13 +475,15 @@ function mostrarResumen() {
 
 async function reservarTurno() {
     
-    const {id, fecha, hora, peluquero, servicios} = turno;
+    const {id, nombre, telefono, fecha, hora, peluquero, servicios} = turno;
     
     // Arreglo con los IDs de los servicios
     const idServicios = servicios.map(servicio => servicio.id);
     
     const datos = new FormData();
     datos.append('usuario_id', id);
+    datos.append('nombre', nombre);
+    datos.append('telefono', telefono);
     datos.append('fecha', fecha);
     datos.append('hora', hora);
     datos.append('peluquero_id', peluquero.id);
@@ -473,15 +501,32 @@ async function reservarTurno() {
         const resultado = await respuesta.json();
 
         if(resultado.resultado) {
+            // Construir mensaje de WhatsApp
+            const nombresServicios = servicios.map(s => s.nombre).join(', ');
+            const total = servicios.reduce((sum, s) => sum + parseInt(s.precio), 0);
+
+            // Formatear fecha legible
+            const [anio, mes, dia] = fecha.split('-');
+            const fechaObj = new Date(Number(anio), Number(mes) - 1, Number(dia));
+            const fechaLegible = fechaObj.toLocaleDateString('es-AR', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            });
+
+            const mensaje = `Hola! Me gustaría reservar un turno.\nNombre: ${nombre}\nServicios: ${nombresServicios}\nFecha: ${fechaLegible} a las ${hora}hs\nTotal a pagar: $${total}`;
+
+            const telefonoPeluquero = peluquero.telefono.replace(/\D/g, '');
+            const urlWhatsApp = `https://wa.me/549${telefonoPeluquero}?text=${encodeURIComponent(mensaje)}`;
+
             Swal.fire({
                 icon: "success",
                 title: "Turno Reservado",
-                text: "Tu turno ha sido reservado exitosamente.",
+                text: "Tu turno ha sido reservado. Serás redirigido a WhatsApp.",
                 button: "OK",
                 customClass: {
                     popup: 'mi-alerta'
                 }
             }).then(() => {
+                window.open(urlWhatsApp, '_blank');
                 setTimeout(() => {
                     window.location.reload();
                 }, 1000);
@@ -499,6 +544,4 @@ async function reservarTurno() {
             }
         });
     }
-
-    // console.log([..datos]);
 }
