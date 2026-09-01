@@ -15,6 +15,6 @@
 }
 
 .boton-inicio {
-    @include m.boton(v.$azul, v.$blanco);
-    justify-self: flex-end;
+    @include m.boton(v.$negro, v.$azul);
+    justify-self: flex-start;
 }

@@ -31,19 +31,19 @@
 
             <div class="nav-acciones">
                 <?php if($auth): ?>
-                    <span class="usuario-nombre">Hola, <?php echo s(explode(' ', $nombre)[0]); ?></span>
+                    <a href="/usuario" class="boton-nav boton-nav-secundario"><i class="fa-solid fa-user"></i>&nbsp;Mi Cuenta</a>
                     <?php if($admin): ?>
-                        <a href="/admin" class="boton-nav">Panel Admin</a>
+                        <a href="/admin" class="boton-nav"><i class="fa-solid fa-user-tie"></i>&nbsp;Panel Admin</a>
                     <?php elseif($peluquero_sesion): ?>
-                        <a href="/peluquero" class="boton-nav">Mi Panel</a>
+                        <a href="/peluquero" class="boton-nav"><i class="fa-solid fa-user-tie"></i>&nbsp;Mi Panel</a>
                     <?php else: ?>
-                        <a href="/turno" class="boton-nav">Sacar Turno</a>
+                        <a href="/turno" class="boton-nav"><i class="fa-solid fa-calendar-check"></i>&nbsp;Sacar Turno</a>
                     <?php endif; ?>
-                    <a href="/logout" class="boton-nav boton-nav-secundario">Cerrar Sesión</a>
+                    <a href="/logout" class="boton-nav boton-nav-logout"><i class="fa-solid fa-right-from-bracket"></i>&nbsp;Cerrar Sesión</a>
                 <?php else: ?>
-                    <a href="/login" class="boton-nav boton-nav-secundario">Iniciar Sesión</a>
-                    <a href="/crear-cuenta" class="boton-nav boton-nav-link">Registrarse</a>
-                    <a href="/turno" class="boton-nav boton-nav-cta">Reservar Turno</a>
+                    <a href="/login" class="boton-nav boton-nav-secundario"><i class="fa-solid fa-user"></i>&nbsp;Iniciar Sesión</a>
+                    <a href="/crear-cuenta" class="boton-nav boton-nav-link"><i class="fa-solid fa-user-plus"></i>&nbsp;Registrarse</a>
+                    <a href="/turno" class="boton-nav boton-nav-cta"><i class="fa-solid fa-calendar-check"></i>&nbsp;Reservar Turno</a>
                 <?php endif; ?>
             </div>
         </nav>
@@ -57,14 +57,14 @@
         <div class="badge-hero">
             <span>✦</span> Estilo & Cuidado Masculino Premium
         </div>
-        <h1 class="hero-titulo">Eleva Tu Estilo con los Mejores Profesionales</h1>
+        <h1 class="hero-titulo">Elevá Tu Estilo con los Mejores Profesionales</h1>
         <p class="hero-descripcion">
             Cortes clásicos, degradados modernos, perfilado de barba y tratamientos exclusivos. Reserva tu turno de forma rápida, con o sin registro.
         </p>
 
         <div class="hero-botones">
-            <a href="/turno" class="boton boton-primario">Reservar Turno Ahora</a>
-            <a href="#servicios" class="boton boton-secundario">Ver Servicios</a>
+            <a href="/turno" class="boton boton-primario"><i class="fa-solid fa-calendar-check"></i>&nbsp;Reservar Turno Ahora</a>
+            <a href="#servicios" class="boton boton-secundario"><i class="fa-solid fa-list"></i>&nbsp;Ver Servicios</a>
         </div>
 
         <div class="hero-stats">

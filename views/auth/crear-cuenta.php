@@ -2,6 +2,10 @@
 /** @var Model\Usuario $usuario */
 ?>
 
+<a href="/" style="text-decoration: none; flex-direction: flex-start; padding: 1rem; margin-top: 4rem;">
+    <i class="fa-solid fa-house" style="color: #fff;"></i>
+</a>
+
 <h1 class="nombre-pagina">Crear Cuenta</h1>
 <p class="descripcion-pagina">Llena el formulario para crear una cuenta</p>
 

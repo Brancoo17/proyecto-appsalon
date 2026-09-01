@@ -15,7 +15,7 @@
         <div class="avatar-icono">
             <i class="fa-solid fa-user"></i>
         </div>
-        <p>Hola, <span><?php echo (isset($_SESSION['login']) && $_SESSION['login']) ? s($usuarioNombre) : 'Invitado'; ?></span></p>
+        <p><span><?php echo (isset($_SESSION['login']) && $_SESSION['login']) ? s($usuarioNombre) : 'Invitado'; ?></span></p>
     </div>
 
     <?php if(isset($_SESSION['login']) && $_SESSION['login']): ?>

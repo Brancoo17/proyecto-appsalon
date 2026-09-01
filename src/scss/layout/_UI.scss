@@ -212,9 +212,13 @@
         
         p {
             text-decoration: none;
-            color: v.$azul;
+            color: v.$blanco;
             font-size: 2rem;
             font-weight: v.$bold;
+        }
+        
+        i {
+            color: v.$azul;
         }
     }
 }
