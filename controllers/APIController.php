@@ -24,30 +24,36 @@ class APIController {
     public static function turnos() {
         // Obtener la fecha de los parámetros de la URL (?fecha=YYYY-MM-DD)
         $fecha = $_GET['fecha'] ?? '';
-
-        // Obtener el peluquero_id de los parámetros de la URL (?peluquero_id=X)
         $peluquero_id = $_GET['peluquero_id'] ?? '';
         
         // Sanitizar la fecha y peluquero_id para evitar inyección SQL
         $fecha = filter_var($fecha, FILTER_SANITIZE_SPECIAL_CHARS);
         $peluquero_id = filter_var($peluquero_id, FILTER_SANITIZE_SPECIAL_CHARS);
 
-        if (!$fecha || !$peluquero_id) {
+        if (!$fecha) {
             echo json_encode([]);
             return;
         }
 
-        // Obtener solo las citas de este peluquero en este día específico
-        $query = "SELECT hora FROM turnos WHERE fecha = '{$fecha}' AND peluquero_id = '{$peluquero_id}'";
+        // Obtener las citas para esta fecha (y opcionalmente por peluquero)
+        if(!empty($peluquero_id)) {
+            $query = "SELECT hora, peluquero_id FROM turnos WHERE fecha = '{$fecha}' AND peluquero_id = '{$peluquero_id}'";
+        } else {
+            $query = "SELECT hora, peluquero_id FROM turnos WHERE fecha = '{$fecha}'";
+        }
+
         $turnos = Turno::consultarSQL($query);
         
-        // Mapear el resultado para obtener solo las horas en un arreglo plano de strings
-        $horasOcupadas = array_map(function($turno) {
-            // Extraer HH:MM eliminando los segundos de la base de datos (ej. "10:00:00" -> "10:00")
-            return substr($turno->hora, 0, 5);
+        // Mapear el resultado para obtener hora en formato HH:MM y peluquero_id
+        $resultado = array_map(function($turno) {
+            return [
+                'hora' => substr($turno->hora, 0, 5),
+                'peluquero_id' => $turno->peluquero_id
+            ];
         }, $turnos);
+
         // Devolver la respuesta en formato JSON
-        echo json_encode($horasOcupadas);
+        echo json_encode($resultado);
     }
 
     public static function guardar() {
@@ -108,6 +114,33 @@ class APIController {
         }
 
         echo json_encode($resultado);
+    }
+
+    public static function cambiarEstado() {
+        if($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id = $_POST['id'] ?? null;
+            $estado = $_POST['estado'] ?? '';
+
+            $estadosValidos = ['reservado', 'completado', 'cancelado'];
+            if(!in_array($estado, $estadosValidos) || !$id) {
+                echo json_encode(['resultado' => false, 'mensaje' => 'Datos no válidos']);
+                return;
+            }
+
+            $turno = Turno::find($id);
+            if(!$turno) {
+                echo json_encode(['resultado' => false, 'mensaje' => 'Turno no encontrado']);
+                return;
+            }
+
+            $turno->estado = $estado;
+            $resultado = $turno->guardar();
+
+            echo json_encode([
+                'resultado' => (bool)$resultado,
+                'estado' => $estado
+            ]);
+        }
     }
 
     public static function eliminar() {

@@ -1,6 +1,379 @@
 @use 'base/variables' as *;
+@use 'base/mixins' as m;
 @use 'sass:color';
 
+// Cabecera de paneles con botón nuevo
+.panel-header {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin: 2rem 0;
+    padding: 2rem 0;
+
+    @include m.tablet {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    h2 {
+        margin: 0;
+    }
+
+    .boton-nuevo {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+        background: linear-gradient(135deg, $azul 0%, color.adjust($azul, $lightness: -10%) 100%);
+        color: $blanco;
+        font-weight: $bold;
+        font-size: 1.4rem;
+        padding: 1rem 1.8rem;
+        border-radius: 0.8rem;
+        text-decoration: none;
+        box-shadow: 0 4px 15px rgba(13, 166, 243, 0.3);
+        transition: all 0.25s ease;
+        align-self: flex-start;
+
+        @include m.tablet {
+            align-self: auto;
+        }
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(13, 166, 243, 0.45);
+            background: linear-gradient(135deg, color.adjust($azul, $lightness: 5%) 0%, $azul 100%);
+        }
+    }
+}
+
+// Alerta de estado vacío
+.alerta-vacio {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+    border-radius: 1.2rem;
+    padding: 3rem 2rem;
+    text-align: center;
+    margin: 2.5rem 0;
+
+    p {
+        color: #94a3b8;
+        font-size: 1.5rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+
+        i {
+            color: $azul;
+            font-size: 2rem;
+        }
+    }
+}
+
+// Contenedor responsivo para las tablas modernas
+.contenedor-tabla {
+    width: 100%;
+    overflow-x: auto;
+    background: rgba(24, 25, 28, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    margin: 2rem 0;
+    -webkit-overflow-scrolling: touch;
+
+    // Scrollbar estilizado
+    &::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 4px;
+
+        &:hover {
+            background: rgba(13, 166, 243, 0.4);
+        }
+    }
+}
+
+// Estilos de la tabla principal
+.tabla-admin {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 1.35rem;
+
+    thead {
+        background: rgba(255, 255, 255, 0.03);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+        th {
+            color: #94a3b8;
+            font-weight: $bold;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 1.4rem 1.4rem;
+            white-space: nowrap;
+        }
+    }
+
+    tbody {
+        tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background-color 0.2s ease;
+
+            &:last-child {
+                border-bottom: none;
+            }
+
+            &:hover {
+                background-color: rgba(13, 166, 243, 0.06);
+            }
+        }
+
+        td {
+            padding: 1.4rem 1.4rem;
+            vertical-align: middle;
+            color: $blanco;
+            font-weight: $regular;
+
+            &.col-id {
+                color: #64748b;
+                font-weight: $bold;
+                white-space: nowrap;
+            }
+        }
+    }
+}
+
+// Elementos y Badges dentro de la tabla
+.badge-hora {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(13, 166, 243, 0.12);
+    color: $azul;
+    padding: 0.4rem 0.9rem;
+    border-radius: 0.6rem;
+    font-weight: $bold;
+    font-size: 1.3rem;
+    border: 1px solid rgba(13, 166, 243, 0.25);
+    white-space: nowrap;
+}
+
+.cliente-nombre,
+.peluquero-nombre {
+    display: block;
+    font-weight: $bold;
+    color: $blanco;
+    font-size: 1.35rem;
+    white-space: nowrap;
+
+    i {
+        color: $azul;
+        margin-right: 0.4rem;
+        font-size: 1.2rem;
+    }
+}
+
+.cliente-contacto,
+.col-email span,
+.col-telefono span {
+    display: block;
+    font-size: 1.2rem;
+    color: #94a3b8;
+    margin-top: 0.2rem;
+    white-space: nowrap;
+
+    i {
+        width: 1.4rem;
+        color: $azul;
+    }
+}
+
+.lista-servicios-tabla {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 15rem;
+}
+
+.badge-servicio {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.3rem 0.7rem;
+    border-radius: 0.5rem;
+    font-size: 1.2rem;
+    color: #cbd5e1;
+
+    em {
+        color: $azul;
+        font-style: normal;
+        font-weight: $bold;
+        margin-left: 0.3rem;
+    }
+}
+
+.badge-pago {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 2rem;
+    font-size: 1.15rem;
+    font-weight: $bold;
+    white-space: nowrap;
+
+    &--transferencia {
+        background: rgba(168, 85, 247, 0.15);
+        color: #c084fc;
+        border: 1px solid rgba(168, 85, 247, 0.3);
+    }
+
+    &--efectivo {
+        background: rgba(34, 197, 94, 0.15);
+        color: #4ade80;
+        border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+}
+
+.badge-estado {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 1.1rem;
+    border-radius: 2rem;
+    font-size: 1.2rem;
+    font-weight: $bold;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    user-select: none;
+
+    i {
+        font-size: 1.1rem;
+        opacity: 0.8;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+
+        i {
+            opacity: 1;
+            transform: scale(1.15);
+        }
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+
+    &--reservado {
+        background: rgba(13, 166, 243, 0.18);
+        color: #38bdf8;
+        border: 1px solid rgba(13, 166, 243, 0.4);
+
+        &:hover {
+            background: rgba(13, 166, 243, 0.28);
+        }
+    }
+
+    &--completado {
+        background: rgba(34, 197, 94, 0.18);
+        color: #4ade80;
+        border: 1px solid rgba(34, 197, 94, 0.4);
+
+        &:hover {
+            background: rgba(34, 197, 94, 0.28);
+        }
+    }
+
+    &--cancelado {
+        background: rgba(239, 68, 68, 0.18);
+        color: #f87171;
+        border: 1px solid rgba(239, 68, 68, 0.4);
+
+        &:hover {
+            background: rgba(239, 68, 68, 0.28);
+        }
+    }
+}
+
+.precio-total {
+    color: #38bdf8;
+    font-size: 1.45rem;
+    font-weight: $bold;
+    white-space: nowrap;
+}
+
+// Botones de acción en tabla
+.acciones-tabla {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+
+    form {
+        margin: 0;
+    }
+}
+
+.boton-editar-tabla {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.4rem;
+    height: 3.4rem;
+    border-radius: 0.8rem;
+    background: rgba(13, 166, 243, 0.12);
+    color: $azul;
+    border: 1px solid rgba(13, 166, 243, 0.3);
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+
+    &:hover {
+        background: $azul;
+        color: $blanco;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(13, 166, 243, 0.4);
+    }
+}
+
+.boton-eliminar-tabla {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.4rem;
+    height: 3.4rem;
+    border-radius: 0.8rem;
+    background: rgba(239, 68, 68, 0.12);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: #ef4444;
+        color: $blanco;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
+}
+
+// Compatibilidad hacia atrás
 .turnos {
     list-style: none;
     padding: 0;

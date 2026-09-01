@@ -2,12 +2,10 @@
 <?php /** @var string $telefono */ ?>
 <?php /** @var int|string $id */ ?>
 
-<h1 class="nombre-pagina">Crear Nuevo Turno</h1>
-<p class="descripcion-pagina">Elige tus servicios y coloca tus datos</p>
-
 <?php include_once __DIR__ . '/../templates/barra.php'; ?>
 
-<a href="/" class="boton-volver"><i class="fa-solid fa-house"></i> Volver a Inicio</a>
+<h1 class="nombre-pagina">Crear Nuevo Turno</h1>
+<p class="descripcion-pagina">Elige tus servicios y coloca tus datos</p>
 
 <div id="app">
     <nav class="tabs">
@@ -42,21 +40,40 @@
                 <input type="date" id="fecha" min="<?php echo date('Y-m-d'); ?>" />
             </div>
 
-            <!-- NUEVO: Campo de selección de Peluquero -->
-            <div class="campo" id="campo-peluquero" style="display: none;">
-                <label for="peluquero">Peluquero:</label>
-                <select id="peluquero">
-                    <option value="" disabled selected>-- Seleccione un Peluquero --</option>
-                </select>
-            </div>
-
             <div class="etiqueta-horas"></div>
 
             <div class="campo">
                 <!-- Aquí se inyectarán las horas dinámicamente -->
                 <div id="horas" class="listado-horas"></div>
-                <!-- Input oculto para seguir guardando la hora seleccionada en el formulario si es necesario -->
+                <!-- Input oculto para guardar la hora seleccionada -->
                 <input type="hidden" id="hora" />
+            </div>
+
+            <!-- Campo de selección de Peluquero con Modal -->
+            <div class="campo campo-profesional" id="campo-profesional" style="display: none;">
+                <label>Profesional:</label>
+                <div class="selector-profesional">
+                    <button type="button" id="btn-seleccionar-peluquero" class="boton-modal-peluquero">
+                        <i class="fa-solid fa-scissors"></i> Ver Profesionales Disponibles
+                    </button>
+                    <div id="peluquero-seleccionado-info" class="peluquero-info-badge" style="display: none;"></div>
+                </div>
+            </div>
+
+            <div class="campo campo-pago">
+                <label>Método de Pago:</label>
+                <div class="opciones-pago">
+                    <label class="opcion-radio">
+                        <input type="radio" name="metodo_pago" value="efectivo" checked>
+                        <span class="radio-custom"></span>
+                        <span class="radio-label"><i class="fa-solid fa-money-bill-wave"></i> Efectivo</span>
+                    </label>
+                    <label class="opcion-radio">
+                        <input type="radio" name="metodo_pago" value="transferencia">
+                        <span class="radio-custom"></span>
+                        <span class="radio-label"><i class="fa-solid fa-building-columns"></i> Transferencia</span>
+                    </label>
+                </div>
             </div>
 
             <input type="hidden" id="id" value="<?php echo s($id); ?>" />

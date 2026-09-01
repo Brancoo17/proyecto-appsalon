@@ -1,40 +1,166 @@
 @use 'base/variables' as v;
+@use 'base/mixins' as m;
+@use 'sass:color';
 
 .contenido-resumen {
-    p {
-        margin-bottom: 1rem;
-    }
+    background: rgba(26, 27, 32, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.4rem;
+    padding: 2.5rem 2rem;
+    margin-top: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 
-    span {
-        color: v.$azul;
+    h3 {
+        color: v.$blanco;
+        font-size: 1.8rem;
         font-weight: v.$bold;
-        font-size: 2.4rem;
+        margin: 2rem 0 1.5rem 0;
+        padding-bottom: 0.8rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+
+    p {
+        margin-bottom: 1.2rem;
+        font-size: 1.5rem;
+        color: #94a3b8;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        span {
+            color: v.$blanco;
+            font-weight: v.$bold;
+            font-size: 1.5rem;
+            text-align: right;
+        }
+    }
+
+    .contenedor-servicio {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.2rem 1.4rem;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 0.8rem;
+        margin-bottom: 0.8rem;
+
+        p {
+            margin: 0;
+            font-size: 1.45rem;
+            color: v.$blanco;
+            font-weight: v.$bold;
+
+            &:last-child {
+                color: v.$azul;
+                font-size: 1.6rem;
+                font-weight: v.$black;
+
+                span {
+                    color: #94a3b8;
+                    font-size: 1.3rem;
+                    font-weight: v.$regular;
+                }
+            }
+        }
+
+        &:last-of-type {
+            margin-bottom: 2rem;
+        }
+    }
+
+    .boton {
+        display: block;
+        width: 100%;
+        background: linear-gradient(135deg, v.$azul 0%, color.adjust(v.$azul, $lightness: -10%) 100%);
+        color: v.$blanco;
+        font-size: 1.6rem;
+        font-weight: v.$bold;
+        padding: 1.5rem;
+        border: none;
+        border-radius: 1rem;
+        cursor: pointer;
+        margin-top: 3rem;
+        text-align: center;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 18px rgba(13, 166, 243, 0.4);
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(13, 166, 243, 0.55);
+            background: linear-gradient(135deg, color.adjust(v.$azul, $lightness: 5%) 0%, v.$azul 100%);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
     }
 }
 
-.contenedor-servicio {
-    padding: 2rem 0;
-    border-bottom: 1px solid v.$gris;   
-
-    &:last-of-type {
-        margin-bottom: v.$separacion;
-    }
-}
-
+// Modal SweetAlert personalizado
 .mi-alerta {
-    width: 60rem !important;
-    font-size: 1.8rem;
-}
+    background: #1e2026 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 1.5rem !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6) !important;
+    color: #ffffff !important;
+    font-family: inherit !important;
 
-.mi-alerta .swal2-title {
-    font-size: 3rem;
-}
+    .swal2-title {
+        color: #ffffff !important;
+        font-size: 2.2rem !important;
+        font-weight: 700 !important;
+    }
 
-.mi-alerta .swal2-html-container {
-    font-size: 1.8rem;
-}
+    .swal2-html-container {
+        color: #94a3b8 !important;
+        font-size: 1.5rem !important;
+    }
 
-.mi-alerta .swal2-confirm {
-    font-size: 1.6rem;
-    padding: 1rem 2rem;
+    .swal2-select {
+        background: rgba(255, 255, 255, 0.08) !important;
+        color: #ffffff !important;
+        border: 1.5px solid rgba(13, 166, 243, 0.4) !important;
+        border-radius: 0.8rem !important;
+        padding: 1rem 1.4rem !important;
+        font-size: 1.5rem !important;
+        font-family: inherit !important;
+        width: 85% !important;
+        margin: 1.5rem auto !important;
+
+        option {
+            background: #1e2026 !important;
+            color: #ffffff !important;
+        }
+
+        &:focus {
+            outline: none !important;
+            border-color: v.$azul !important;
+            box-shadow: 0 0 0 3px rgba(13, 166, 243, 0.25) !important;
+        }
+    }
+
+    .swal2-confirm {
+        background: linear-gradient(135deg, v.$azul 0%, color.adjust(v.$azul, $lightness: -10%) 100%) !important;
+        border-radius: 0.8rem !important;
+        font-size: 1.4rem !important;
+        font-weight: 700 !important;
+        padding: 1rem 2.2rem !important;
+        box-shadow: 0 4px 12px rgba(13, 166, 243, 0.35) !important;
+    }
+
+    .swal2-cancel {
+        background: #475569 !important;
+        border-radius: 0.8rem !important;
+        font-size: 1.4rem !important;
+        font-weight: 700 !important;
+        padding: 1rem 2.2rem !important;
+    }
 }

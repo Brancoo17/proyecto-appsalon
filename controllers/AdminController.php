@@ -26,7 +26,9 @@ class AdminController {
                             usuarios.telefono,
                             servicios.nombre as servicio,
                             servicios.precio,
-                            CONCAT(peluqueros.nombre, ' ', peluqueros.apellido) as peluquero ";
+                            CONCAT(peluqueros.nombre, ' ', peluqueros.apellido) as peluquero,
+                            turnos.estado,
+                            turnos.metodo_pago ";
 
         $consulta .= " FROM turnos ";
         $consulta .= " LEFT OUTER JOIN usuarios ";

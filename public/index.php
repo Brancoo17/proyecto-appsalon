@@ -55,6 +55,7 @@ $router->get('/api/servicios', [APIController::class, 'index']);
 $router->get('/api/turnos', [APIController::class, 'turnos']);
 $router->get('/api/peluqueros', [APIController::class, 'peluqueros']);
 $router->post('/api/turnos', [APIController::class, 'guardar']);
+$router->post('/api/turnos/estado', [APIController::class, 'cambiarEstado']);
 $router->post('/api/eliminar', [APIController::class, 'eliminar']);
 
 // CRUD de Servicios

@@ -1,14 +1,17 @@
 @use 'base/variables' as v;
 @use 'base/mixins' as m;
+@use 'sass:color';
 
 .seccion {
-    padding: 5rem 0;
+    padding: 3rem 0;
     display: none;
 
     .text-center {
         text-align: center;
+        color: #94a3b8;
+        font-size: 1.5rem;
+        margin-bottom: 2.5rem;
     }
-
 }
 
 .mostrar {
@@ -19,60 +22,250 @@
     display: none;
 }
 
+// Botón para volver al inicio
+.boton-volver {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 1.35rem;
+    font-weight: v.$bold;
+    margin-bottom: 2rem;
+    padding: 0.6rem 1.2rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 2rem;
+    transition: all 0.2s ease;
+    align-self: flex-start;
+
+    &:hover {
+        color: v.$blanco;
+        background: rgba(13, 166, 243, 0.12);
+        border-color: rgba(13, 166, 243, 0.35);
+        transform: translateX(-3px);
+    }
+
+    i {
+        font-size: 1.2rem;
+        color: v.$azul;
+    }
+}
+
+// Grilla de Horas
+.etiqueta-horas {
+    p {
+        color: #94a3b8;
+        font-size: 1.45rem;
+        font-weight: v.$bold;
+        margin: 1.5rem 0 1rem 0;
+    }
+}
+
 .listado-horas {
     width: 100%;
-    @include m.grid(2, 1rem);
-    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 0.5rem;
 
     @include m.tablet {
-        @include m.grid(4, 1rem);
+        grid-template-columns: repeat(4, 1fr);
     }
 }
 
 .hora-boton {
-    background-color: #ffffff;
-    color: #4a5568;
-    border: 2px solid #e2e8f0;
-    padding: 0.8rem;
-    border-radius: 0.5rem;
+    background: rgba(26, 27, 32, 0.85);
+    color: #cbd5e1;
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    padding: 1.1rem 0.5rem;
+    border-radius: 0.9rem;
     cursor: pointer;
-    font-weight: 700;
-    transition: all 0.3s ease;
+    font-weight: v.$bold;
+    font-size: 1.4rem;
+    transition: all 0.25s ease;
     text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+    &:hover:not(:disabled) {
+        background: rgba(13, 166, 243, 0.15);
+        color: v.$blanco;
+        border-color: v.$azul;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(13, 166, 243, 0.3);
+    }
+
+    &.seleccionada {
+        background: linear-gradient(135deg, v.$azul 0%, color.adjust(v.$azul, $lightness: -10%) 100%);
+        color: v.$blanco;
+        border-color: transparent;
+        box-shadow: 0 4px 15px rgba(13, 166, 243, 0.45);
+        transform: translateY(-2px);
+    }
+
+    &:disabled {
+        background: rgba(255, 255, 255, 0.02);
+        color: #475569;
+        border-color: rgba(255, 255, 255, 0.04);
+        cursor: not-allowed;
+        text-decoration: line-through;
+        opacity: 0.5;
+    }
 }
 
-.hora-boton:hover:not(:disabled) {
-    background-color: v.$azul;
-    color: #ffffff;
-    border-color: v.$azul;
-}
+// Selector de Profesional con Modal
+.campo-profesional {
+    margin: 2.5rem 0;
 
-.hora-boton.seleccionada {
-    background-color: v.$azul;
-    color: #ffffff;
-    border-color: v.$azul;
-}
-
-.hora-boton:disabled {
-    background-color: #f7fafc;
-    color: #cbd5e0;
-    border-color: #e2e8f0;
-    cursor: not-allowed;
-    text-decoration: line-through;
-}
-
-#campo-peluquero {
-    select {
-        width: 100%;
+    .selector-profesional {
         padding: 1rem;
-        border: 1px solid v.$gris;
-        border-radius: 0.5rem;
-        font-size: 1.6rem;
-        font-family: inherit;
-        appearance: auto;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+        width: 100%;
+    }
+
+    .boton-modal-peluquero {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.8rem;
+        background: linear-gradient(135deg, v.$azul 0%, color.adjust(v.$azul, $lightness: -10%) 100%);
+        color: v.$blanco;
+        border: none;
+        border-radius: 0.9rem;
+        padding: 1.3rem 2rem;
+        font-size: 1.45rem;
+        font-weight: v.$bold;
         cursor: pointer;
-        background-color: v.$blanco;
-        color: v.$negro;
-        margin: 2rem 0;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 15px rgba(13, 166, 243, 0.3);
+        width: 100%;
+
+        @include m.tablet {
+            width: auto;
+            align-self: flex-start;
+        }
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(13, 166, 243, 0.45);
+            background: linear-gradient(135deg, color.adjust(v.$azul, $lightness: 5%) 0%, v.$azul 100%);
+        }
+
+        i {
+            font-size: 1.5rem;
+        }
+    }
+
+    .peluquero-badge-card {
+        display: flex;
+        align-items: center;
+        gap: 1.4rem;
+        background: rgba(26, 27, 32, 0.9);
+        border: 1.5px solid rgba(13, 166, 243, 0.35);
+        border-radius: 1rem;
+        padding: 1.2rem 1.6rem;
+        color: v.$blanco;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+
+        i {
+            font-size: 2.2rem;
+            color: v.$azul;
+            background: rgba(13, 166, 243, 0.12);
+            width: 4.4rem;
+            height: 4.4rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        div {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+
+            strong {
+                font-size: 1.15rem;
+                color: #94a3b8;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+            }
+
+            span {
+                font-size: 1.55rem;
+                font-weight: v.$bold;
+                color: v.$blanco;
+            }
+        }
+    }
+}
+
+// Opciones de Método de Pago con Radio Buttons
+.campo-pago {
+    margin: 2.5rem 0;
+
+    .opciones-pago {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.2rem;
+        width: 100%;
+
+        @include m.tablet {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    .opcion-radio {
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        background: rgba(26, 27, 32, 0.85);
+        border: 1.5px solid rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        padding: 1.3rem 1.6rem;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        user-select: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+        input[type="radio"] {
+            accent-color: v.$azul;
+            width: 1.8rem;
+            height: 1.8rem;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .radio-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 1.45rem;
+            font-weight: v.$bold;
+            color: v.$blanco;
+
+            i {
+                color: v.$azul;
+                font-size: 1.6rem;
+            }
+        }
+
+        &:hover {
+            background: rgba(32, 34, 40, 0.95);
+            border-color: rgba(13, 166, 243, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+        }
+
+        &:has(input[type="radio"]:checked) {
+            background: linear-gradient(135deg, rgba(13, 166, 243, 0.18) 0%, rgba(13, 166, 243, 0.05) 100%);
+            border-color: v.$azul;
+            box-shadow: 0 4px 15px rgba(13, 166, 243, 0.3);
+        }
     }
 }

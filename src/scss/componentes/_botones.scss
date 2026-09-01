@@ -13,3 +13,8 @@
     @include m.boton(v.$azul, v.$blanco);
     justify-self: flex-start;
 }
+
+.boton-inicio {
+    @include m.boton(v.$azul, v.$blanco);
+    justify-self: flex-end;
+}

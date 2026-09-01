@@ -4,7 +4,7 @@ namespace Model;
 
 class AdminTurno extends ActiveRecord {
     protected static string $tabla = 'turnosServicios';
-    protected static array $columnasDB = ['id', 'hora', 'cliente', 'email', 'telefono', 'servicio', 'precio', 'peluquero'];
+    protected static array $columnasDB = ['id', 'hora', 'cliente', 'email', 'telefono', 'servicio', 'precio', 'peluquero', 'estado', 'metodo_pago'];
 
     public ?int $id;
     public string $hora;
@@ -14,6 +14,8 @@ class AdminTurno extends ActiveRecord {
     public string $servicio;
     public string $precio;
     public string $peluquero;
+    public string $estado;
+    public string $metodo_pago;
 
     public function __construct($args = []) {
         $this->id = $args['id'] ?? null;
@@ -24,5 +26,7 @@ class AdminTurno extends ActiveRecord {
         $this->servicio = $args['servicio'] ?? '';
         $this->precio = $args['precio'] ?? '';
         $this->peluquero = $args['peluquero'] ?? '';
+        $this->estado = $args['estado'] ?? '';
+        $this->metodo_pago = $args['metodo_pago'] ?? '';
     }
 }

@@ -4,45 +4,83 @@
 
 .listado-servicios {
     display: grid;
-    gap: 2rem;
+    gap: 1.6rem;
+    margin-top: 2.5rem;
 
     @include m.tablet {
-        @include m.grid(2, 2rem);
+        @include m.grid(2, 1.6rem);
     }
 
     .servicio {
-        background-color: v.$blanco;
-        padding: 2rem;
-        border-radius: 1rem;
-        transition-property: transform;
-        transition-duration: .3s;
+        background: rgba(26, 27, 32, 0.85);
+        border: 1.5px solid rgba(255, 255, 255, 0.08);
+        padding: 2.2rem 2rem;
+        border-radius: 1.2rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         text-align: center;
+        position: relative;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 1.2rem;
 
         &:hover {
-            transform: scale(1.05);
-            cursor: pointer;
-            background-color: color.scale(v.$blanco, $lightness: -5%);
+            transform: translateY(-4px);
+            border-color: rgba(13, 166, 243, 0.45);
+            background: rgba(32, 34, 40, 0.95);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
         }
 
         &.seleccionado {
-            background-color: v.$azul;
+            background: linear-gradient(135deg, rgba(13, 166, 243, 0.2) 0%, rgba(13, 166, 243, 0.06) 100%);
+            border-color: v.$azul;
+            box-shadow: 0 8px 25px rgba(13, 166, 243, 0.3);
+            transform: translateY(-2px);
+
+            &::after {
+                content: '\f00c';
+                font-family: 'Font Awesome 6 Free';
+                font-weight: 900;
+                position: absolute;
+                top: 1.2rem;
+                right: 1.2rem;
+                width: 2.4rem;
+                height: 2.4rem;
+                background: v.$azul;
+                color: v.$blanco;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.1rem;
+                box-shadow: 0 2px 8px rgba(13, 166, 243, 0.4);
+            }
 
             p {
                 color: v.$blanco;
             }
+
+            .precio-servicio {
+                color: v.$azul;
+            }
         }
 
         p {
-            color: v.$negro;
+            color: v.$blanco;
+            font-size: 1.6rem;
+            font-weight: v.$bold;
             margin: 0;
-            margin-bottom: 1rem;
+            line-height: 1.3;
         }
 
         .precio-servicio {
             color: v.$azul;
-            font-weight: v.$bold;
-            font-size: 2.5rem;
+            font-weight: v.$black;
+            font-size: 2.4rem;
             margin: 0;
+            letter-spacing: -0.02em;
         }
     }
 }

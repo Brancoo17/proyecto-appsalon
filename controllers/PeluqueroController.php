@@ -123,7 +123,8 @@ class PeluqueroController {
         // Consultar turnos asignados únicamente a este peluquero
         $consulta = "SELECT turnos.id, turnos.hora, CONCAT(usuarios.nombre, ' ', usuarios.apellido) as cliente, ";
         $consulta .= " usuarios.email, usuarios.telefono, servicios.nombre as servicio, servicios.precio, ";
-        $consulta .= " CONCAT(peluqueros.nombre, ' ', peluqueros.apellido) as peluquero ";
+        $consulta .= " CONCAT(peluqueros.nombre, ' ', peluqueros.apellido) as peluquero, ";
+        $consulta .= " turnos.estado, turnos.metodo_pago ";
         $consulta .= " FROM turnos ";
         $consulta .= " LEFT OUTER JOIN usuarios ON turnos.usuario_id = usuarios.id ";
         $consulta .= " LEFT OUTER JOIN peluqueros ON turnos.peluquero_id = peluqueros.id ";

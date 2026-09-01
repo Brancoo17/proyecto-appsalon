@@ -2,12 +2,16 @@ let paso = 1;
 const pasoInicial = 1;
 const pasoFinal = 3;
 
+let todosPeluqueros = [];
+let turnosDelDia = [];
+
 const turno = {
     id: '',
     nombre: '',
     telefono: '',
     fecha: '',
     hora: '',
+    metodo_pago: 'efectivo',
     servicios: [],
     peluquero: null
 };
@@ -24,15 +28,15 @@ function iniciarApp() {
     paginaSiguiente();
     paginaAnterior();
 
-    consultarAPI(); // Consulta la API en el backend de PHP
-    consultarPeluqueros(); // Carga los peluqueros en el select
+    consultarAPI(); // Consulta la API de servicios
+    consultarPeluqueros(); // Carga todos los peluqueros
 
     idCliente();
     nombreCliente(); // Añade el nombre del cliente al objeto de turno
     telefonoCliente(); // Añade el teléfono del cliente al objeto de turno
-    seleccionarFecha(); // Añade la fecha del turno en el objeto
-    seleccionarPeluquero(); // Escucha cambios en el select
-    seleccionarHora(); // Añade la hora del turno en el objeto
+    seleccionarFecha(); // Añade la fecha del turno y carga horas
+    botonModalPeluqueros(); // Escucha clic en botón para abrir modal de peluqueros
+    seleccionarMetodoPago(); // Maneja los radio buttons del método de pago
 
     mostrarResumen(); // Muestra el resumen del turno
 }
@@ -152,31 +156,31 @@ function mostrarServicios(servicios) {
 
         document.querySelector('.listado-servicios').appendChild(servicioDiv);
     });
-    
+
 }
 
 function seleccionarServicio(servicio) {
-    const {id} = servicio;
-    const {servicios} = turno;
+    const { id } = servicio;
+    const { servicios } = turno;
 
     // Identificar el elemento al que se le da click
     const divServicio = document.querySelector(`[data-id-servicio="${id}"]`);
 
     // Comprobar si un servicio ya fue agregado
     if(servicios.some(agregado => agregado.id === id)) {
-        // Eliminar el servicio
+        // Eliminarlo
         turno.servicios = servicios.filter(agregado => agregado.id !== id);
         divServicio.classList.remove('seleccionado');
     } else {
-        // Agregar el servicio
+        // Agregarlo
         divServicio.classList.add('seleccionado');
         turno.servicios = [...servicios, servicio];
     }
 }
 
 function idCliente() {
-    const inputId = document.querySelector('#id');
-    turno.id = inputId ? inputId.value : '';
+    const idInput = document.querySelector('#id');
+    turno.id = idInput ? idInput.value : '';
 }
 
 function nombreCliente() {
@@ -201,6 +205,8 @@ function telefonoCliente() {
 
 function seleccionarFecha() {
     const inputFecha = document.querySelector('#fecha');
+    if(!inputFecha) return;
+
     inputFecha.addEventListener('input', function(e) {
 
         // Obtener el dia y convertirlo a numero
@@ -209,95 +215,59 @@ function seleccionarFecha() {
         // Si el dia es domingo, mostrar una alerta
         if(dia === 0) {
             e.target.value = '';
+            turno.fecha = '';
+            turno.hora = '';
+            turno.peluquero = null;
+            document.querySelector('#horas').innerHTML = '';
+            document.querySelector('.etiqueta-horas').innerHTML = '';
+            const campoProf = document.querySelector('#campo-profesional');
+            if(campoProf) campoProf.style.display = 'none';
+            actualizarUIProfesional();
             mostrarAlerta('Día Domingo no disponible', 'error', '.formulario');
         } else {
             turno.fecha = e.target.value;
-
-            // Mostrar el contenedor del peluquero
-            const campoPeluquero = document.querySelector('#campo-peluquero');
-            campoPeluquero.style.display = 'block';
-            // Resetear el peluquero y horas anteriores para forzar nueva selección
-            turno.peluquero = null;
             turno.hora = '';
-            document.querySelector('#peluquero').value = '';
-            document.querySelector('#horas').innerHTML = '';
-            document.querySelector('.etiqueta-horas').innerHTML = '';
+            turno.peluquero = null;
+            const campoProf = document.querySelector('#campo-profesional');
+            if(campoProf) campoProf.style.display = 'none';
+            actualizarUIProfesional();
+
+            // Cargar horas disponibles para el día seleccionado
+            obtenerHorasDisponiblesDia(turno.fecha);
         }
 
     });
 }
 
-// NUEVAS FUNCIONES PARA CARGAR Y MANEJAR PELUQUEROS
+// Carga la lista completa de peluqueros
 async function consultarPeluqueros() {
     try {
         const url = 'http://localhost:3000/api/peluqueros';
         const resultado = await fetch(url);
-        const peluqueros = await resultado.json();
-        llenarSelectPeluqueros(peluqueros);
+        todosPeluqueros = await resultado.json();
     } catch (error) {
         console.log(error);
     }
 }
 
-function llenarSelectPeluqueros(peluqueros) {
-    const select = document.querySelector('#peluquero');
-    peluqueros.forEach(peluquero => {
-        const option = document.createElement('OPTION');
-        option.value = peluquero.id;
-        option.textContent = `${peluquero.nombre} ${peluquero.apellido}`;
-        option.dataset.nombre = peluquero.nombre;
-        option.dataset.apellido = peluquero.apellido;
-        option.dataset.telefono = peluquero.telefono;
-        select.appendChild(option);
-    });
-}
-
-// 5. NUEVA FUNCIÓN para manejar la selección del peluquero
-function seleccionarPeluquero() {
-    const selectPeluquero = document.querySelector('#peluquero');
-    selectPeluquero.addEventListener('change', function(e) {
-        const peluqueroId = e.target.value;
-        const opcionSeleccionada = e.target.options[e.target.selectedIndex];
-        turno.peluquero = {
-            id: peluqueroId,
-            nombre: opcionSeleccionada.dataset.nombre,
-            apellido: opcionSeleccionada.dataset.apellido,
-            telefono: opcionSeleccionada.dataset.telefono
-        };
-        // Resetear la hora al cambiar de peluquero
-        turno.hora = '';
-        // Buscar horas disponibles para esta fecha + peluquero
-        if (turno.fecha) {
-            obtenerHorasDisponibles(turno.fecha, peluqueroId);
-        }
-    });
-}
-
-function seleccionarHora() {
-    // Esta función queda simplificada ya que la lógica de selección 
-    // se maneja al hacer clic en los botones dinámicos.
-}
-
-async function obtenerHorasDisponibles(fecha, peluqueroId) {
-
-    if(!turno.peluquero) return;
-
+// Obtener turnos ocupados de la fecha y pintar las horas disponibles
+async function obtenerHorasDisponiblesDia(fecha) {
     try {
-        const url = `http://localhost:3000/api/turnos?fecha=${fecha}&peluquero_id=${peluqueroId}`;
+        const url = `http://localhost:3000/api/turnos?fecha=${fecha}`;
         const resultado = await fetch(url);
-        const horasOcupadas = await resultado.json();
+        turnosDelDia = await resultado.json();
 
-        mostrarHorasGrid(horasOcupadas);
+        mostrarHorasGrid(turnosDelDia);
     } catch (error) {
         console.log(error);
     }
 }
 
-function mostrarHorasGrid(horasOcupadas) {
+function mostrarHorasGrid(turnosOcupados) {
 
     // Obtener el div de la etiqueta de horas
     const etiquetaHoras = document.querySelector('.etiqueta-horas');
-    etiquetaHoras.innerHTML = ''; // Limpiar la etiqueta de horas anterior
+    etiquetaHoras.innerHTML = '';
 
     // Crear la etiqueta de horas
     const etiqueta = document.createElement('P');
@@ -307,15 +277,17 @@ function mostrarHorasGrid(horasOcupadas) {
 
     // Agregar las horas disponibles al contenedor
     const contenedorHoras = document.querySelector('#horas');
-    contenedorHoras.innerHTML = ''; // Limpiar las horas anteriores
+    contenedorHoras.innerHTML = '';
 
     // Listado de todas las horas posibles
     const horasEstablecimiento = [
         "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", 
-        "13:00", "13:30", "14:00", "14:30", "15:00", "15:30",
+        "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", 
         "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", 
         "19:00", "19:30", "20:00", "20:30", "21:00"
     ];
+
+    const totalPeluqueros = todosPeluqueros.length || 1;
 
     horasEstablecimiento.forEach(hora => {
         const botonHora = document.createElement('BUTTON');
@@ -323,27 +295,33 @@ function mostrarHorasGrid(horasOcupadas) {
         botonHora.textContent = hora;
         botonHora.classList.add('hora-boton');
 
-        // Comprobar si la hora está en el arreglo de horas ocupadas
-        if (horasOcupadas.includes(hora)) {
+        // Turnos ocupados en esta hora específica
+        const ocupadosEnHora = turnosOcupados.filter(t => t.hora === hora);
+
+        // Si todos los peluqueros están ocupados a esta hora, deshabilitar
+        if (ocupadosEnHora.length >= totalPeluqueros && totalPeluqueros > 0) {
             botonHora.disabled = true;
             botonHora.classList.add('ocupada');
         } else {
-            // Permitir seleccionar la hora si está disponible
             botonHora.onclick = function() {
-                // Remover la clase seleccionado de otros botones
                 const botonSeleccionadoPrevio = document.querySelector('.hora-boton.seleccionada');
                 if (botonSeleccionadoPrevio) {
                     botonSeleccionadoPrevio.classList.remove('seleccionada');
                 }
 
-                // Marcar el botón actual como seleccionado
                 botonHora.classList.add('seleccionada');
-
-                // Guardar la hora en el objeto del turno
                 turno.hora = hora;
-                
-                // (Opcional) Asignar el valor al input hidden para compatibilidad
                 document.querySelector('#hora').value = hora;
+
+                // Resetear peluquero anterior para obligar a seleccionar uno válido para esta nueva hora
+                turno.peluquero = null;
+                actualizarUIProfesional();
+
+                // Mostrar la sección para elegir profesional
+                const campoProfesional = document.querySelector('#campo-profesional');
+                if(campoProfesional) {
+                    campoProfesional.style.display = 'block';
+                }
             };
         }
 
@@ -351,6 +329,146 @@ function mostrarHorasGrid(horasOcupadas) {
     });
 }
 
+function botonModalPeluqueros() {
+    const btn = document.querySelector('#btn-seleccionar-peluquero');
+    if(!btn) return;
+
+    btn.addEventListener('click', async function() {
+        if(!turno.fecha || !turno.hora) {
+            mostrarAlerta('Por favor, selecciona primero una fecha y hora', 'error', '.formulario');
+            return;
+        }
+
+        // Obtener IDs de peluqueros ocupados a esa fecha y hora
+        const bookedPeluqueroIds = turnosDelDia
+            .filter(t => t.hora === turno.hora)
+            .map(t => String(t.peluquero_id));
+
+        // Filtrar peluqueros disponibles
+        const peluquerosDisponibles = todosPeluqueros.filter(p => !bookedPeluqueroIds.includes(String(p.id)));
+
+        if(peluquerosDisponibles.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Sin disponibilidad',
+                text: 'No hay profesionales disponibles para este horario. Por favor elige otra hora.',
+                customClass: { popup: 'mi-alerta' }
+            });
+            return;
+        }
+
+        // Construir opciones para el SweetAlert2
+        const inputOptions = {
+            'primero_disponible': '✨ Primero disponible (Cualquier profesional)'
+        };
+
+        peluquerosDisponibles.forEach(p => {
+            inputOptions[p.id] = `👤 ${p.nombre} ${p.apellido}`;
+        });
+
+        const valorActual = (turno.peluquero && !turno.peluquero.esPrimero) ? turno.peluquero.id : 'primero_disponible';
+
+        const { value: seleccion } = await Swal.fire({
+            title: 'Elige tu Profesional',
+            text: `Profesionales disponibles para el ${turno.fecha} a las ${turno.hora}hs:`,
+            input: 'select',
+            inputOptions: inputOptions,
+            inputValue: valorActual,
+            showCancelButton: true,
+            confirmButtonText: 'Confirmar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#0da6f3',
+            cancelButtonColor: '#64748b',
+            customClass: {
+                popup: 'mi-alerta'
+            },
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Debes seleccionar una opción';
+                }
+            }
+        });
+
+        if(seleccion) {
+            if(seleccion === 'primero_disponible') {
+                // Asignar el primer peluquero libre
+                const pLibre = peluquerosDisponibles[0];
+                turno.peluquero = {
+                    id: pLibre.id,
+                    nombre: 'Primero Disponible',
+                    apellido: `(${pLibre.nombre} ${pLibre.apellido})`,
+                    telefono: pLibre.telefono,
+                    esPrimero: true
+                };
+            } else {
+                const pElegido = peluquerosDisponibles.find(p => String(p.id) === String(seleccion));
+                if(pElegido) {
+                    turno.peluquero = {
+                        id: pElegido.id,
+                        nombre: pElegido.nombre,
+                        apellido: pElegido.apellido,
+                        telefono: pElegido.telefono,
+                        esPrimero: false
+                    };
+                }
+            }
+            actualizarUIProfesional();
+        }
+    });
+}
+
+function actualizarUIProfesional() {
+    const btn = document.querySelector('#btn-seleccionar-peluquero');
+    const badgeInfo = document.querySelector('#peluquero-seleccionado-info');
+
+    if(!badgeInfo || !btn) return;
+
+    if(turno.peluquero) {
+        badgeInfo.style.display = 'block';
+        if(turno.peluquero.esPrimero) {
+            badgeInfo.innerHTML = `
+                <div class="peluquero-badge-card">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <div>
+                        <strong>Asignación Automática:</strong>
+                        <span>${turno.peluquero.apellido}</span>
+                    </div>
+                </div>
+            `;
+        } else {
+            badgeInfo.innerHTML = `
+                <div class="peluquero-badge-card">
+                    <i class="fa-solid fa-user-check"></i>
+                    <div>
+                        <strong>Profesional:</strong>
+                        <span>${turno.peluquero.nombre} ${turno.peluquero.apellido}</span>
+                    </div>
+                </div>
+            `;
+        }
+        btn.innerHTML = `<i class="fa-solid fa-arrows-rotate"></i> Cambiar Profesional`;
+    } else {
+        badgeInfo.style.display = 'none';
+        badgeInfo.innerHTML = '';
+        btn.innerHTML = `<i class="fa-solid fa-scissors"></i> Ver Profesionales Disponibles`;
+    }
+}
+
+function seleccionarMetodoPago() {
+    const radios = document.querySelectorAll('input[name="metodo_pago"]');
+    
+    // Obtener valor inicial seleccionado
+    const seleccionado = document.querySelector('input[name="metodo_pago"]:checked');
+    if(seleccionado) {
+        turno.metodo_pago = seleccionado.value;
+    }
+
+    radios.forEach(radio => {
+        radio.addEventListener('change', function(e) {
+            turno.metodo_pago = e.target.value;
+        });
+    });
+}
 
 function mostrarAlerta(mensaje, tipo, elemento, desaparece = true) {
 
@@ -386,15 +504,12 @@ function mostrarResumen() {
         resumen.removeChild(resumen.firstChild);
     }
 
-    const { nombre, telefono, fecha, hora, servicios, peluquero } = turno;
+    const { nombre, telefono, fecha, hora, servicios, peluquero, metodo_pago } = turno;
 
-    if(!nombre || !telefono || !fecha || !hora || !peluquero || servicios.length === 0) {
-        mostrarAlerta('Faltan datos de Nombre, Teléfono, Servicios, Fecha, Peluquero u Hora', 'error', '.contenido-resumen', false);
-
+    if(!nombre || !telefono || !fecha || !hora || !peluquero || !metodo_pago || servicios.length === 0) {
+        mostrarAlerta('Faltan datos de Nombre, Teléfono, Servicios, Fecha, Hora, Profesional o Método de Pago', 'error', '.contenido-resumen', false);
         return;
     }
-
-    // Construir el resumen
 
     // Heading para Servicios en Resumen
     const headingServicios = document.createElement('H3');
@@ -432,7 +547,8 @@ function mostrarResumen() {
 
     // Mostrar peluquero en el resumen
     const peluqueroTurno = document.createElement('P');
-    peluqueroTurno.innerHTML = `<span>Peluquero: </span> ${turno.peluquero.nombre} ${turno.peluquero.apellido}`;
+    const nombreProf = peluquero.esPrimero ? `Primero disponible ${peluquero.apellido}` : `${peluquero.nombre} ${peluquero.apellido}`;
+    peluqueroTurno.innerHTML = `<span>Profesional: </span> ${nombreProf}`;
 
     // Formatear la fecha en español
     const [year, month, day] = fecha.split('-');
@@ -458,6 +574,10 @@ function mostrarResumen() {
     const horaTurno = document.createElement('P');
     horaTurno.innerHTML = `<span>Hora: </span> ${hora}hs`;
 
+    const metodoPagoTurno = document.createElement('P');
+    const metodoFormateado = metodo_pago.charAt(0).toUpperCase() + metodo_pago.slice(1);
+    metodoPagoTurno.innerHTML = `<span>Método de Pago: </span> ${metodoFormateado}`;
+
     // Botón para crear un turno
     const botonReservar = document.createElement('button');
     botonReservar.classList.add('boton');
@@ -469,13 +589,14 @@ function mostrarResumen() {
     resumen.appendChild(peluqueroTurno);
     resumen.appendChild(fechaTurno);
     resumen.appendChild(horaTurno);
+    resumen.appendChild(metodoPagoTurno);
 
     resumen.appendChild(botonReservar);
 }
 
 async function reservarTurno() {
     
-    const {id, nombre, telefono, fecha, hora, peluquero, servicios} = turno;
+    const {id, nombre, telefono, fecha, hora, peluquero, servicios, metodo_pago} = turno;
     
     // Arreglo con los IDs de los servicios
     const idServicios = servicios.map(servicio => servicio.id);
@@ -487,6 +608,7 @@ async function reservarTurno() {
     datos.append('fecha', fecha);
     datos.append('hora', hora);
     datos.append('peluquero_id', peluquero.id);
+    datos.append('metodo_pago', metodo_pago);
     datos.append('servicios', idServicios);
 
     try {
@@ -512,21 +634,25 @@ async function reservarTurno() {
                 weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
             });
 
-            const mensaje = `Hola! Me gustaría reservar un turno.\nNombre: ${nombre}\nServicios: ${nombresServicios}\nFecha: ${fechaLegible} a las ${hora}hs\nTotal a pagar: $${total}`;
+            const metodoFormateado = metodo_pago.charAt(0).toUpperCase() + metodo_pago.slice(1);
+            const nombreProf = peluquero.esPrimero ? `Primero disponible ${peluquero.apellido}` : `${peluquero.nombre} ${peluquero.apellido}`;
+            const mensaje = `Hola! Me gustaría reservar un turno.\nNombre: ${nombre}\nProfesional: ${nombreProf}\nServicios: ${nombresServicios}\nFecha: ${fechaLegible} a las ${hora}hs\nMétodo de Pago: ${metodoFormateado}\nTotal a pagar: $${total}`;
 
-            const telefonoPeluquero = peluquero.telefono.replace(/\D/g, '');
+            const telefonoPeluquero = peluquero.telefono ? peluquero.telefono.replace(/\D/g, '') : '';
             const urlWhatsApp = `https://wa.me/549${telefonoPeluquero}?text=${encodeURIComponent(mensaje)}`;
 
             Swal.fire({
-                icon: "success",
-                title: "Turno Reservado",
-                text: "Tu turno ha sido reservado. Serás redirigido a WhatsApp.",
+                icon: "warning",
+                title: "Confirmación de Turno",
+                text: "Presiona OK para confirmar el turno en WhatsApp.",
                 button: "OK",
                 customClass: {
                     popup: 'mi-alerta'
                 }
             }).then(() => {
-                window.open(urlWhatsApp, '_blank');
+                if(telefonoPeluquero) {
+                    window.open(urlWhatsApp, '_blank');
+                }
                 setTimeout(() => {
                     window.location.reload();
                 }, 1000);
