@@ -49,10 +49,12 @@ $router->post('/peluqueros/eliminar', [PeluqueroController::class, 'eliminar']);
 
 // Panel Privado del Peluquero
 $router->get('/peluquero', [PeluqueroController::class, 'panel']);
+$router->get('/peluquero/servicios-horarios', [PeluqueroController::class, 'serviciosHorarios']);
 
 // API de Turnos
 $router->get('/api/servicios', [APIController::class, 'index']);
 $router->get('/api/turnos', [APIController::class, 'turnos']);
+$router->get('/api/disponibilidad', [APIController::class, 'disponibilidad']);
 $router->get('/api/peluqueros', [APIController::class, 'peluqueros']);
 $router->post('/api/turnos', [APIController::class, 'guardar']);
 $router->post('/api/turnos/estado', [APIController::class, 'cambiarEstado']);

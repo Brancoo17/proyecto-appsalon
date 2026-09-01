@@ -1,4 +1,4 @@
-<a href="/servicios" class="boton-volver">&laquo; Volver</a>
+<a href="/servicios" style="font-size: 2rem; color: #fff;"><i class="fa-solid fa-arrow-left"></i></a>
 
 <h1 class="nombre-pagina">Actualizar Servicio</h1>
 <p class="descripcion-pagina">A continuación, puedes actualizar los datos de tu servicio</p>

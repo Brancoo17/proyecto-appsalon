@@ -4,6 +4,7 @@ namespace Controllers;
 
 use MVC\Router;
 use Model\Peluquero;
+use Model\Servicio;
 use Model\AdminTurno;
 
 class PeluqueroController {
@@ -27,6 +28,9 @@ class PeluqueroController {
         isAdmin();
 
         $peluquero = new Peluquero;
+        $servicios = Servicio::all();
+        $serviciosPeluquero = [];
+        $horarios = [];
         $alertas = [];
 
         if($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -42,7 +46,12 @@ class PeluqueroController {
                 } else {
                     $peluquero->hashPassword();
                     $resultado = $peluquero->guardar();
-                    if($resultado) {
+                    if($resultado && !empty($resultado['id'])) {
+                        $peluquero->id = (int)$resultado['id'];
+                        // Sincronizar servicios y horarios asignados
+                        $peluquero->sincronizarServicios($_POST['servicios'] ?? []);
+                        $peluquero->sincronizarHorarios($_POST['horarios'] ?? []);
+
                         header('Location: /peluqueros');
                     }
                 }
@@ -52,6 +61,9 @@ class PeluqueroController {
         $router->render('peluqueros/crear', [
             'nombre' => $_SESSION['nombre'],
             'peluquero' => $peluquero,
+            'servicios' => $servicios,
+            'serviciosPeluquero' => $serviciosPeluquero,
+            'horarios' => $horarios,
             'alertas' => $alertas
         ]);
     }
@@ -63,6 +75,14 @@ class PeluqueroController {
 
         if(!is_numeric($_GET['id'])) return;
         $peluquero = Peluquero::find($_GET['id']);
+        if(!$peluquero) {
+            header('Location: /peluqueros');
+            return;
+        }
+
+        $servicios = Servicio::all();
+        $serviciosPeluquero = $peluquero->getServiciosIds();
+        $horarios = $peluquero->getHorarios();
         $alertas = [];
 
         if($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -80,6 +100,10 @@ class PeluqueroController {
 
             if(empty($alertas)) {
                 $peluquero->guardar();
+                // Sincronizar servicios y horarios asignados
+                $peluquero->sincronizarServicios($_POST['servicios'] ?? []);
+                $peluquero->sincronizarHorarios($_POST['horarios'] ?? []);
+
                 header('Location: /peluqueros');
             }
         }
@@ -87,6 +111,9 @@ class PeluqueroController {
         $router->render('peluqueros/actualizar', [
             'nombre' => $_SESSION['nombre'],
             'peluquero' => $peluquero,
+            'servicios' => $servicios,
+            'serviciosPeluquero' => $serviciosPeluquero,
+            'horarios' => $horarios,
             'alertas' => $alertas
         ]);
     }
@@ -123,6 +150,7 @@ class PeluqueroController {
         // Consultar turnos asignados únicamente a este peluquero
         $consulta = "SELECT turnos.id, turnos.hora, CONCAT(usuarios.nombre, ' ', usuarios.apellido) as cliente, ";
         $consulta .= " usuarios.email, usuarios.telefono, servicios.nombre as servicio, servicios.precio, ";
+        $consulta .= " COALESCE(servicios.duracion, 30) as duracion, ";
         $consulta .= " CONCAT(peluqueros.nombre, ' ', peluqueros.apellido) as peluquero, ";
         $consulta .= " turnos.estado, turnos.metodo_pago ";
         $consulta .= " FROM turnos ";
@@ -138,6 +166,24 @@ class PeluqueroController {
             'nombre' => $_SESSION['nombre'],
             'turnos' => $turnos,
             'fecha' => $fecha
+        ]);
+    }
+
+    // Sección de Servicios y Horarios para el Peluquero (Solo Lectura)
+    public static function serviciosHorarios(Router $router) {
+        if(!isset($_SESSION)) session_start();
+        isPeluquero();
+
+        $peluqueroId = $_SESSION['id'];
+        $peluquero = Peluquero::find($peluqueroId);
+
+        $misServicios = $peluquero ? $peluquero->getServicios() : [];
+        $misHorarios = $peluquero ? $peluquero->getHorarios() : [];
+
+        $router->render('peluquero/servicios-horarios', [
+            'nombre' => $_SESSION['nombre'],
+            'misServicios' => $misServicios,
+            'misHorarios' => $misHorarios
         ]);
     }
 }

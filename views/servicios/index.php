@@ -21,6 +21,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Nombre del Servicio</th>
+                    <th>Duración</th>
                     <th>Precio</th>
                     <th>Acciones</th>
                 </tr>
@@ -30,6 +31,9 @@
                     <tr>
                         <td class="col-id">#<?php echo s($servicio->id); ?></td>
                         <td class="col-nombre"><strong><?php echo s($servicio->nombre); ?></strong></td>
+                        <td class="col-duracion">
+                            <span class="badge-duracion"><i class="fa-regular fa-clock"></i> <?php echo s($servicio->duracion ?? 30); ?> min</span>
+                        </td>
                         <td class="col-precio"><strong class="precio-total">$<?php echo s($servicio->precio); ?></strong></td>
                         <td class="col-acciones">
                             <div class="acciones-tabla">

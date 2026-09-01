@@ -57,17 +57,30 @@
             font-size: 1.45rem;
             color: v.$blanco;
             font-weight: v.$bold;
+        }
 
-            &:last-child {
+        .meta-servicio-resumen {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+
+            .duracion-tag {
+                font-size: 1.2rem;
+                color: #94a3b8;
+                background: rgba(255, 255, 255, 0.05);
+                padding: 0.2rem 0.7rem;
+                border-radius: 1rem;
+
+                i {
+                    color: v.$azul;
+                    font-size: 1.1rem;
+                }
+            }
+
+            .precio-tag {
                 color: v.$azul;
                 font-size: 1.6rem;
                 font-weight: v.$black;
-
-                span {
-                    color: #94a3b8;
-                    font-size: 1.3rem;
-                    font-weight: v.$regular;
-                }
             }
         }
 

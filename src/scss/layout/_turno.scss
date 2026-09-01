@@ -59,6 +59,13 @@
         font-size: 1.45rem;
         font-weight: v.$bold;
         margin: 1.5rem 0 1rem 0;
+
+        em {
+            color: #38bdf8;
+            font-style: normal;
+            font-weight: v.$regular;
+            margin-left: 0.5rem;
+        }
     }
 }
 
@@ -266,6 +273,209 @@
             background: linear-gradient(135deg, rgba(13, 166, 243, 0.18) 0%, rgba(13, 166, 243, 0.05) 100%);
             border-color: v.$azul;
             box-shadow: 0 4px 15px rgba(13, 166, 243, 0.3);
+        }
+    }
+}
+
+// ==========================================
+// CARRITO FLOTANTE DE SERVICIOS
+// ==========================================
+.contenedor-carrito-flotante {
+    display: flex;
+    justify-content: center;
+    margin: 1.5rem 0 2.5rem 0;
+
+    @include m.tablet {
+        justify-content: flex-end;
+    }
+}
+
+.btn-flotante-carrito {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.2rem;
+    background: rgba(26, 27, 32, 0.9);
+    border: 1.5px solid rgba(255, 255, 255, 0.12);
+    border-radius: 3rem;
+    padding: 0.8rem 1.8rem;
+    color: v.$blanco;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+
+    .icono-carrito {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 3.6rem;
+        height: 3.6rem;
+        background: rgba(13, 166, 243, 0.12);
+        border-radius: 50%;
+        color: v.$azul;
+        font-size: 1.5rem;
+
+        .badge-contador {
+            position: absolute;
+            top: -0.4rem;
+            right: -0.4rem;
+            background: v.$azul;
+            color: v.$blanco;
+            font-size: 1.1rem;
+            font-weight: v.$bold;
+            width: 1.8rem;
+            height: 1.8rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(13, 166, 243, 0.5);
+        }
+    }
+
+    .info-carrito-texto {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.2rem;
+
+        .label-carrito {
+            font-size: 1.15rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .total-monto {
+            font-size: 1.5rem;
+            color: v.$blanco;
+            font-weight: v.$black;
+        }
+    }
+
+    &:hover {
+        background: rgba(32, 34, 40, 0.95);
+        border-color: v.$azul;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(13, 166, 243, 0.3);
+    }
+
+    &.con-items {
+        border-color: rgba(13, 166, 243, 0.4);
+        background: linear-gradient(135deg, rgba(26, 27, 32, 0.95) 0%, rgba(13, 166, 243, 0.08) 100%);
+    }
+}
+
+// Estilos del Modal de Carrito (SweetAlert)
+.alerta-carrito-modal {
+    width: 55rem !important;
+
+    .modal-carrito-contenido {
+        margin-top: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .lista-items-carrito {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+        max-height: 25rem;
+        overflow-y: auto;
+        padding-right: 0.5rem;
+    }
+
+    .item-carrito-fila {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 0.9rem;
+        padding: 1.2rem 1.4rem;
+        gap: 1rem;
+
+        .item-carrito-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.3rem;
+
+            .item-carrito-nombre {
+                color: v.$blanco;
+                font-size: 1.45rem;
+            }
+
+            .item-carrito-duracion {
+                font-size: 1.2rem;
+                color: #94a3b8;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+
+                i {
+                    color: v.$azul;
+                }
+            }
+        }
+
+        .item-carrito-derecha {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+
+            .item-carrito-precio {
+                font-size: 1.55rem;
+                color: v.$azul;
+                font-weight: v.$bold;
+            }
+
+            .btn-eliminar-item-carrito {
+                background: rgba(239, 68, 68, 0.15);
+                border: 1px solid rgba(239, 68, 68, 0.3);
+                color: #f87171;
+                border-radius: 0.6rem;
+                padding: 0.6rem 0.8rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
+
+                &:hover {
+                    background: #ef4444;
+                    color: v.$blanco;
+                }
+            }
+        }
+    }
+
+    .resumen-carrito-totales {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 1.2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+
+        .fila-total-carrito {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.4rem;
+            color: #94a3b8;
+
+            strong {
+                color: v.$blanco;
+            }
+
+            &.total-destacado {
+                font-size: 1.65rem;
+                margin-top: 0.4rem;
+
+                strong {
+                    color: v.$azul;
+                    font-size: 1.8rem;
+                    font-weight: v.$black;
+                }
+            }
         }
     }
 }

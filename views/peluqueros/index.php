@@ -23,11 +23,23 @@
                     <th>Nombre y Apellido</th>
                     <th>Email</th>
                     <th>Teléfono</th>
+                    <th>Servicios</th>
+                    <th>Horarios</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach($peluqueros as $peluquero): ?>
+                <?php foreach($peluqueros as $peluquero): 
+                    $serviciosAsignados = array_map(function($s) {
+                        return [
+                            'nombre' => $s->nombre,
+                            'precio' => $s->precio,
+                            'duracion' => $s->duracion ?? 30
+                        ];
+                    }, $peluquero->getServicios());
+
+                    $horariosAsignados = $peluquero->getHorarios();
+                ?>
                     <tr>
                         <td class="col-id">#<?php echo s($peluquero->id); ?></td>
                         <td class="col-nombre">
@@ -38,6 +50,22 @@
                         </td>
                         <td class="col-telefono">
                             <span><i class="fa-solid fa-phone"></i> <?php echo s($peluquero->telefono); ?></span>
+                        </td>
+                        <td class="col-modal-btn">
+                            <button type="button" class="btn-tabla-modal btn-ver-servicios-modal" 
+                                    data-nombre="<?php echo s($peluquero->nombre . " " . $peluquero->apellido); ?>"
+                                    data-servicios='<?php echo json_encode($serviciosAsignados); ?>'
+                                    title="Ver Servicios Asignados">
+                                <i class="fa-solid fa-scissors"></i> Ver (<?php echo count($serviciosAsignados); ?>)
+                            </button>
+                        </td>
+                        <td class="col-modal-btn">
+                            <button type="button" class="btn-tabla-modal btn-ver-horarios-modal" 
+                                    data-nombre="<?php echo s($peluquero->nombre . " " . $peluquero->apellido); ?>"
+                                    data-horarios='<?php echo json_encode($horariosAsignados); ?>'
+                                    title="Ver Horarios de Trabajo">
+                                <i class="fa-solid fa-clock"></i> Ver Horarios
+                            </button>
                         </td>
                         <td class="col-acciones">
                             <div class="acciones-tabla">
@@ -58,3 +86,10 @@
         </table>
     </div>
 <?php endif; ?>
+
+<?php
+    $script = "
+        <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        <script src='build/js/buscador.js'></script>
+    ";
+?>

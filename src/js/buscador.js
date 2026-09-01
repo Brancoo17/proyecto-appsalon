@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', function() {
 function iniciarApp() {
     buscarPorFecha();
     cambiarEstadoTurno();
+    modalVerServiciosPeluquero();
+    modalVerHorariosPeluquero();
 }
 
 function buscarPorFecha() {
@@ -101,6 +103,96 @@ function cambiarEstadoTurno() {
                     });
                 }
             }
+        });
+    });
+}
+
+function modalVerServiciosPeluquero() {
+    const botones = document.querySelectorAll('.btn-ver-servicios-modal');
+    botones.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const nombre = this.dataset.nombre || 'Peluquero';
+            let servicios = [];
+            try {
+                servicios = JSON.parse(this.dataset.servicios || '[]');
+            } catch (e) {
+                servicios = [];
+            }
+
+            let html = `<div class="modal-info-listado">`;
+            if (servicios.length === 0) {
+                html += `<p class="alerta-vacio-modal"><i class="fa-solid fa-circle-exclamation"></i> Este profesional no tiene servicios asignados actualmente.</p>`;
+            } else {
+                html += `<div class="lista-items-modal">`;
+                servicios.forEach(s => {
+                    html += `
+                        <div class="item-modal-fila">
+                            <strong><i class="fa-solid fa-scissors"></i> ${s.nombre}</strong>
+                            <div class="item-modal-derecha">
+                                <span class="badge-duracion"><i class="fa-regular fa-clock"></i> ${s.duracion || 30} min</span>
+                                <span class="badge-precio">$${parseInt(s.precio).toLocaleString('es-AR')}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+            html += `</div>`;
+
+            Swal.fire({
+                title: `✂️ Servicios de ${nombre}`,
+                html: html,
+                confirmButtonText: 'Cerrar',
+                confirmButtonColor: '#0da6f3',
+                customClass: { popup: 'mi-alerta alerta-info-peluquero-modal' }
+            });
+        });
+    });
+}
+
+function modalVerHorariosPeluquero() {
+    const diasNombres = {
+        1: 'Lunes',
+        2: 'Martes',
+        3: 'Miércoles',
+        4: 'Jueves',
+        5: 'Viernes',
+        6: 'Sábado'
+    };
+
+    const botones = document.querySelectorAll('.btn-ver-horarios-modal');
+    botones.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const nombre = this.dataset.nombre || 'Peluquero';
+            let horarios = {};
+            try {
+                horarios = JSON.parse(this.dataset.horarios || '{}');
+            } catch (e) {
+                horarios = {};
+            }
+
+            let html = `<div class="modal-info-listado"><div class="lista-items-modal">`;
+            for (let dia = 1; dia <= 6; dia++) {
+                const h = horarios[dia];
+                const activo = h ? (parseInt(h.activo) === 1) : false;
+                const diaNombre = diasNombres[dia];
+
+                html += `
+                    <div class="item-modal-fila ${activo ? 'item-activo' : 'item-inactivo'}">
+                        <strong>${diaNombre}</strong>
+                        ${activo ? `<span class="badge-horario-activo"><i class="fa-regular fa-clock"></i> ${h.hora_inicio.substring(0,5)} a ${h.hora_fin.substring(0,5)} hs</span>` : `<span class="badge-no-laboral">No laboral</span>`}
+                    </div>
+                `;
+            }
+            html += `</div></div>`;
+
+            Swal.fire({
+                title: `🕒 Horarios de ${nombre}`,
+                html: html,
+                confirmButtonText: 'Cerrar',
+                confirmButtonColor: '#0da6f3',
+                customClass: { popup: 'mi-alerta alerta-info-peluquero-modal' }
+            });
         });
     });
 }

@@ -1,4 +1,4 @@
-<?php include_once __DIR__ . '/../templates/barra.php'; ?>
+<a href="/peluqueros" style="font-size: 2rem; color: #fff;"><i class="fa-solid fa-arrow-left"></i></a>
 
 <h1 class="nombre-pagina">Actualizar Peluquero</h1>
 <p class="descripcion-pagina">Modifica los valores del formulario</p>

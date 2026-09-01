@@ -26,6 +26,7 @@ class AdminController {
                             usuarios.telefono,
                             servicios.nombre as servicio,
                             servicios.precio,
+                            COALESCE(servicios.duracion, 30) as duracion,
                             CONCAT(peluqueros.nombre, ' ', peluqueros.apellido) as peluquero,
                             turnos.estado,
                             turnos.metodo_pago ";

@@ -1,4 +1,4 @@
-<a href="/servicios" class="boton-volver">&laquo; Volver</a>
+<a href="/servicios" style="font-size: 2rem; color: #fff;"><i class="fa-solid fa-arrow-left"></i></a>
 
 <h1 class="nombre-pagina">Nuevo Servicio</h1>
 <p class="descripcion-pagina">Llena todos los campos para añadir un nuevo servicio</p>

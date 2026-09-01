@@ -65,6 +65,12 @@
             color: #64748b;
             cursor: not-allowed;
         }
+
+        option {
+            background-color: #1e2026;
+            color: #ffffff;
+            padding: 0.8rem;
+        }
     }
 
     // Estilo especial para input date en navegadores modernos (icono de calendario claro)

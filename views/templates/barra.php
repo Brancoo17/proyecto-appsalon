@@ -49,3 +49,18 @@
         </a>
     </nav>
 <?php } ?>
+
+<?php if(isset($_SESSION['peluquero'])) { ?>
+    <h1 class="nombre-pagina">Panel de Peluquero</h1>
+
+    <nav class="barra-servicios">
+        <a class="boton-nav <?php echo (strpos($uriActual, '/peluquero/servicios-horarios') === false && (strpos($uriActual, '/peluquero') !== false || $uriActual === '/peluquero')) ? 'activo' : ''; ?>" href="/peluquero">
+            <i class="fa-solid fa-calendar-check"></i>
+            <span>Mis Turnos</span>
+        </a>
+        <a class="boton-nav <?php echo (strpos($uriActual, '/peluquero/servicios-horarios') !== false) ? 'activo' : ''; ?>" href="/peluquero/servicios-horarios">
+            <i class="fa-solid fa-scissors"></i>
+            <span>Servicios y Horarios</span>
+        </a>
+    </nav>
+<?php } ?>

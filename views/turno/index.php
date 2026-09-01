@@ -7,6 +7,20 @@
 <h1 class="nombre-pagina">Crear Nuevo Turno</h1>
 <p class="descripcion-pagina">Elige tus servicios y coloca tus datos</p>
 
+<!-- BOTÓN FLOTANTE DEL CARRITO DE SERVICIOS -->
+<div class="contenedor-carrito-flotante">
+    <button type="button" id="btn-carrito" class="btn-flotante-carrito" title="Ver servicios seleccionados">
+        <div class="icono-carrito">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span id="badge-contador-servicios" class="badge-contador">0</span>
+        </div>
+        <div class="info-carrito-texto">
+            <span class="label-carrito">Mis Servicios</span>
+            <strong id="badge-total-servicios" class="total-monto">$0</strong>
+        </div>
+    </button>
+</div>
+
 <div id="app">
     <nav class="tabs">
         <button class="actual" type="button" data-paso="1">Servicios</button>

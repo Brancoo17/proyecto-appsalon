@@ -3,7 +3,12 @@ const pasoInicial = 1;
 const pasoFinal = 3;
 
 let todosPeluqueros = [];
-let turnosDelDia = [];
+let disponibilidadData = {
+    horasDisponibles: [],
+    horasOcupadas: [],
+    peluquerosPorHora: {},
+    duracionTotal: 30
+};
 
 const turno = {
     id: '',
@@ -37,7 +42,9 @@ function iniciarApp() {
     seleccionarFecha(); // Añade la fecha del turno y carga horas
     botonModalPeluqueros(); // Escucha clic en botón para abrir modal de peluqueros
     seleccionarMetodoPago(); // Maneja los radio buttons del método de pago
+    botonModalCarrito(); // Maneja el botón flotante del carrito de servicios
 
+    actualizarCarritoUI(); // Inicializa el badge del carrito
     mostrarResumen(); // Muestra el resumen del turno
 }
 
@@ -94,6 +101,11 @@ function botonesPaginador() {
     } else {
         paginaAnterior.classList.remove('ocultar');
         paginaSiguiente.classList.remove('ocultar');
+
+        // Si entramos al paso 2 y ya había fecha seleccionada, refrescar disponibilidad con los servicios actuales
+        if(turno.fecha) {
+            obtenerHorasDisponiblesDia(turno.fecha);
+        }
     }
 
     mostrarSeccion();
@@ -134,15 +146,24 @@ async function consultarAPI() {
 function mostrarServicios(servicios) {
 
     servicios.forEach(servicio => {
-        const { id, nombre, precio } = servicio;
+        const { id, nombre, precio, duracion } = servicio;
 
         const nombreServicio = document.createElement('P');
         nombreServicio.textContent = nombre;
         nombreServicio.classList.add('nombre-servicio');
 
+        const duracionServicio = document.createElement('SPAN');
+        duracionServicio.innerHTML = `<i class="fa-regular fa-clock"></i> ${duracion || 30} min`;
+        duracionServicio.classList.add('badge-duracion-card');
+
         const precioServicio = document.createElement('P');
         precioServicio.textContent = `$${precio}`;
         precioServicio.classList.add('precio-servicio');
+
+        const infoDiv = document.createElement('DIV');
+        infoDiv.classList.add('info-servicio-meta');
+        infoDiv.appendChild(duracionServicio);
+        infoDiv.appendChild(precioServicio);
 
         const servicioDiv = document.createElement('DIV');
         servicioDiv.classList.add('servicio');
@@ -152,7 +173,7 @@ function mostrarServicios(servicios) {
         };
 
         servicioDiv.appendChild(nombreServicio);
-        servicioDiv.appendChild(precioServicio);
+        servicioDiv.appendChild(infoDiv);
 
         document.querySelector('.listado-servicios').appendChild(servicioDiv);
     });
@@ -170,12 +191,140 @@ function seleccionarServicio(servicio) {
     if(servicios.some(agregado => agregado.id === id)) {
         // Eliminarlo
         turno.servicios = servicios.filter(agregado => agregado.id !== id);
-        divServicio.classList.remove('seleccionado');
+        if(divServicio) divServicio.classList.remove('seleccionado');
     } else {
         // Agregarlo
-        divServicio.classList.add('seleccionado');
+        if(divServicio) divServicio.classList.add('seleccionado');
         turno.servicios = [...servicios, servicio];
     }
+
+    // Resetear hora y peluquero si cambian los servicios seleccionados
+    turno.hora = '';
+    turno.peluquero = null;
+    actualizarUIProfesional();
+    actualizarCarritoUI();
+}
+
+function actualizarCarritoUI() {
+    const badgeContador = document.querySelector('#badge-contador-servicios');
+    const badgeTotal = document.querySelector('#badge-total-servicios');
+    const btnCarrito = document.querySelector('#btn-carrito');
+
+    const total = turno.servicios.reduce((sum, s) => sum + parseInt(s.precio), 0);
+    const cantidad = turno.servicios.length;
+
+    if(badgeContador) badgeContador.textContent = cantidad;
+    if(badgeTotal) badgeTotal.textContent = `$${total.toLocaleString('es-AR')}`;
+
+    if(btnCarrito) {
+        if(cantidad > 0) {
+            btnCarrito.classList.add('con-items');
+        } else {
+            btnCarrito.classList.remove('con-items');
+        }
+    }
+}
+
+function botonModalCarrito() {
+    const btnCarrito = document.querySelector('#btn-carrito');
+    if(!btnCarrito) return;
+
+    btnCarrito.addEventListener('click', function() {
+        abrirModalCarrito();
+    });
+}
+
+function abrirModalCarrito() {
+    const cantidad = turno.servicios.length;
+
+    if(cantidad === 0) {
+        Swal.fire({
+            icon: 'info',
+            title: 'Tu Carrito está vacío',
+            text: 'Selecciona al menos un servicio del catálogo para continuar con tu reserva.',
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: '#0da6f3',
+            customClass: { popup: 'mi-alerta' }
+        });
+        return;
+    }
+
+    const total = turno.servicios.reduce((sum, s) => sum + parseInt(s.precio), 0);
+    const duracionTotal = turno.servicios.reduce((sum, s) => sum + parseInt(s.duracion || 30), 0);
+
+    let htmlServicios = `
+        <div class="modal-carrito-contenido">
+            <div class="lista-items-carrito">
+    `;
+
+    turno.servicios.forEach(s => {
+        htmlServicios += `
+            <div class="item-carrito-fila" id="item-carrito-${s.id}">
+                <div class="item-carrito-info">
+                    <strong class="item-carrito-nombre">${s.nombre}</strong>
+                    <span class="item-carrito-duracion"><i class="fa-regular fa-clock"></i> ${s.duracion || 30} min</span>
+                </div>
+                <div class="item-carrito-derecha">
+                    <span class="item-carrito-precio">$${parseInt(s.precio).toLocaleString('es-AR')}</span>
+                    <button type="button" class="btn-eliminar-item-carrito" data-id="${s.id}" title="Quitar servicio">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+
+    htmlServicios += `
+            </div>
+            <div class="resumen-carrito-totales">
+                <div class="fila-total-carrito">
+                    <span><i class="fa-solid fa-clock"></i> Tiempo Total Estimado:</span>
+                    <strong>${formatearDuracion(duracionTotal)}</strong>
+                </div>
+                <div class="fila-total-carrito total-destacado">
+                    <span><i class="fa-solid fa-money-bill-wave"></i> Total a Pagar:</span>
+                    <strong>$${total.toLocaleString('es-AR')}</strong>
+                </div>
+            </div>
+        </div>
+    `;
+
+    Swal.fire({
+        title: '🛒 Servicios Seleccionados',
+        html: htmlServicios,
+        showCancelButton: true,
+        confirmButtonText: 'Continuar a Fecha y Hora <i class="fa-solid fa-arrow-right"></i>',
+        cancelButtonText: 'Seguir Agregando',
+        confirmButtonColor: '#0da6f3',
+        cancelButtonColor: '#475569',
+        customClass: {
+            popup: 'mi-alerta alerta-carrito-modal'
+        },
+        didOpen: () => {
+            // Escuchar clics en los botones de eliminar dentro del modal
+            const botonesEliminar = document.querySelectorAll('.btn-eliminar-item-carrito');
+            botonesEliminar.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    const servicioId = parseInt(this.dataset.id);
+                    const servicioObj = turno.servicios.find(s => parseInt(s.id) === servicioId);
+                    if(servicioObj) {
+                        seleccionarServicio(servicioObj);
+                        // Cerrar y reabrir modal actualizado
+                        Swal.close();
+                        if(turno.servicios.length > 0) {
+                            abrirModalCarrito();
+                        }
+                    }
+                });
+            });
+        }
+    }).then((result) => {
+        if(result.isConfirmed) {
+            paso = 2;
+            mostrarSeccion();
+            botonesPaginador();
+        }
+    });
 }
 
 function idCliente() {
@@ -232,7 +381,7 @@ function seleccionarFecha() {
             if(campoProf) campoProf.style.display = 'none';
             actualizarUIProfesional();
 
-            // Cargar horas disponibles para el día seleccionado
+            // Cargar horas disponibles filtrando por servicios y horarios
             obtenerHorasDisponiblesDia(turno.fecha);
         }
 
@@ -250,36 +399,37 @@ async function consultarPeluqueros() {
     }
 }
 
-// Obtener turnos ocupados de la fecha y pintar las horas disponibles
+// Obtener disponibilidad calculada en base a Servicios + Duraciones + Fecha + Horarios
 async function obtenerHorasDisponiblesDia(fecha) {
     try {
-        const url = `http://localhost:3000/api/turnos?fecha=${fecha}`;
+        const serviciosIds = turno.servicios.map(s => s.id).join(',');
+        const url = `http://localhost:3000/api/disponibilidad?fecha=${fecha}&servicios=${serviciosIds}`;
         const resultado = await fetch(url);
-        turnosDelDia = await resultado.json();
+        disponibilidadData = await resultado.json();
 
-        mostrarHorasGrid(turnosDelDia);
+        mostrarHorasGrid(disponibilidadData);
     } catch (error) {
         console.log(error);
     }
 }
 
-function mostrarHorasGrid(turnosOcupados) {
+function mostrarHorasGrid(data) {
 
-    // Obtener el div de la etiqueta de horas
     const etiquetaHoras = document.querySelector('.etiqueta-horas');
     etiquetaHoras.innerHTML = '';
 
-    // Crear la etiqueta de horas
+    // Calcular la duración real sumando directamente de turno.servicios para sincronía perfecta
+    const duracionReal = turno.servicios.reduce((sum, s) => sum + parseInt(s.duracion || 30), 0) || (data.duracionTotal || 30);
+    const duracionTexto = formatearDuracion(duracionReal);
+
     const etiqueta = document.createElement('P');
-    etiqueta.textContent = 'Horas disponibles:';
+    etiqueta.innerHTML = `Horas disponibles <em>(Duración estimada: ${duracionTexto})</em>:`;
     etiqueta.classList.add('etiqueta-horas');
     etiquetaHoras.appendChild(etiqueta);
 
-    // Agregar las horas disponibles al contenedor
     const contenedorHoras = document.querySelector('#horas');
     contenedorHoras.innerHTML = '';
 
-    // Listado de todas las horas posibles
     const horasEstablecimiento = [
         "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", 
         "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", 
@@ -287,7 +437,7 @@ function mostrarHorasGrid(turnosOcupados) {
         "19:00", "19:30", "20:00", "20:30", "21:00"
     ];
 
-    const totalPeluqueros = todosPeluqueros.length || 1;
+    const horasOcupadas = data.horasOcupadas || [];
 
     horasEstablecimiento.forEach(hora => {
         const botonHora = document.createElement('BUTTON');
@@ -295,11 +445,7 @@ function mostrarHorasGrid(turnosOcupados) {
         botonHora.textContent = hora;
         botonHora.classList.add('hora-boton');
 
-        // Turnos ocupados en esta hora específica
-        const ocupadosEnHora = turnosOcupados.filter(t => t.hora === hora);
-
-        // Si todos los peluqueros están ocupados a esta hora, deshabilitar
-        if (ocupadosEnHora.length >= totalPeluqueros && totalPeluqueros > 0) {
+        if (horasOcupadas.includes(hora)) {
             botonHora.disabled = true;
             botonHora.classList.add('ocupada');
         } else {
@@ -313,7 +459,7 @@ function mostrarHorasGrid(turnosOcupados) {
                 turno.hora = hora;
                 document.querySelector('#hora').value = hora;
 
-                // Resetear peluquero anterior para obligar a seleccionar uno válido para esta nueva hora
+                // Resetear peluquero anterior al cambiar de hora
                 turno.peluquero = null;
                 actualizarUIProfesional();
 
@@ -339,19 +485,14 @@ function botonModalPeluqueros() {
             return;
         }
 
-        // Obtener IDs de peluqueros ocupados a esa fecha y hora
-        const bookedPeluqueroIds = turnosDelDia
-            .filter(t => t.hora === turno.hora)
-            .map(t => String(t.peluquero_id));
-
-        // Filtrar peluqueros disponibles
-        const peluquerosDisponibles = todosPeluqueros.filter(p => !bookedPeluqueroIds.includes(String(p.id)));
+        // Obtener peluqueros disponibles para la hora seleccionada desde la respuesta de disponibilidad
+        const peluquerosDisponibles = disponibilidadData.peluquerosPorHora[turno.hora] || [];
 
         if(peluquerosDisponibles.length === 0) {
             Swal.fire({
                 icon: 'warning',
-                title: 'Sin disponibilidad',
-                text: 'No hay profesionales disponibles para este horario. Por favor elige otra hora.',
+                title: 'Sin profesionales disponibles',
+                text: 'No hay profesionales disponibles para el tiempo total requerido en este horario. Por favor elige otra hora.',
                 customClass: { popup: 'mi-alerta' }
             });
             return;
@@ -391,7 +532,6 @@ function botonModalPeluqueros() {
 
         if(seleccion) {
             if(seleccion === 'primero_disponible') {
-                // Asignar el primer peluquero libre
                 const pLibre = peluquerosDisponibles[0];
                 turno.peluquero = {
                     id: pLibre.id,
@@ -496,6 +636,21 @@ function mostrarAlerta(mensaje, tipo, elemento, desaparece = true) {
     }
 }
 
+function calcularHoraFin(horaInicio, duracionMinutos) {
+    const [h, m] = horaInicio.split(':').map(Number);
+    const totalMin = (h * 60) + m + duracionMinutos;
+    const finH = String(Math.floor(totalMin / 60)).padStart(2, '0');
+    const finM = String(totalMin % 60).padStart(2, '0');
+    return `${finH}:${finM}`;
+}
+
+function formatearDuracion(minutos) {
+    if (minutos < 60) return `${minutos} min`;
+    const horas = Math.floor(minutos / 60);
+    const minRestantes = minutos % 60;
+    return minRestantes > 0 ? `${horas}h ${minRestantes}m` : `${horas}h`;
+}
+
 function mostrarResumen() {
     const resumen = document.querySelector('.contenido-resumen');
 
@@ -511,6 +666,10 @@ function mostrarResumen() {
         return;
     }
 
+    // Calcular duración total y hora de finalización estimada
+    const duracionTotalMin = servicios.reduce((sum, s) => sum + parseInt(s.duracion || 30), 0);
+    const horaFin = calcularHoraFin(hora, duracionTotalMin);
+
     // Heading para Servicios en Resumen
     const headingServicios = document.createElement('H3');
     headingServicios.textContent = 'Resumen de Servicios';
@@ -518,18 +677,22 @@ function mostrarResumen() {
 
     // Iterando y mostrando los servicios seleccionados
     servicios.forEach(servicio => {
-        const {nombre, precio} = servicio;
+        const {nombre, precio, duracion} = servicio;
 
         const nombreServicio = document.createElement('P');
         nombreServicio.textContent = nombre;
 
-        const precioServicio = document.createElement('P');
-        precioServicio.innerHTML = `<span>Precio: </span> $${precio}`;
+        const metaServicio = document.createElement('DIV');
+        metaServicio.classList.add('meta-servicio-resumen');
+        metaServicio.innerHTML = `
+            <span class="duracion-tag"><i class="fa-regular fa-clock"></i> ${duracion || 30} min</span>
+            <span class="precio-tag">$${precio}</span>
+        `;
 
         const servicioDiv = document.createElement('DIV');
         servicioDiv.classList.add('contenedor-servicio');
         servicioDiv.appendChild(nombreServicio);
-        servicioDiv.appendChild(precioServicio);
+        servicioDiv.appendChild(metaServicio);
 
         resumen.appendChild(servicioDiv);
     });
@@ -545,34 +708,21 @@ function mostrarResumen() {
     const telefonoCliente = document.createElement('P');
     telefonoCliente.innerHTML = `<span>Teléfono: </span> ${telefono}`;
 
-    // Mostrar peluquero en el resumen
     const peluqueroTurno = document.createElement('P');
     const nombreProf = peluquero.esPrimero ? `Primero disponible ${peluquero.apellido}` : `${peluquero.nombre} ${peluquero.apellido}`;
     peluqueroTurno.innerHTML = `<span>Profesional: </span> ${nombreProf}`;
 
     // Formatear la fecha en español
     const [year, month, day] = fecha.split('-');
-
-    const fechaObjt = new Date(
-        Number(year),
-        Number(month) - 1,
-        Number(day)
-    );
-
-    const opciones = {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    };
-
+    const fechaObjt = new Date(Number(year), Number(month) - 1, Number(day));
+    const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     const fechaFormateada = fechaObjt.toLocaleDateString('es-AR', opciones);
 
     const fechaTurno = document.createElement('P');
     fechaTurno.innerHTML = `<span>Fecha: </span> ${fechaFormateada}`;
 
     const horaTurno = document.createElement('P');
-    horaTurno.innerHTML = `<span>Hora: </span> ${hora}hs`;
+    horaTurno.innerHTML = `<span>Horario: </span> ${hora} a ${horaFin} hs (${formatearDuracion(duracionTotalMin)})`;
 
     const metodoPagoTurno = document.createElement('P');
     const metodoFormateado = metodo_pago.charAt(0).toUpperCase() + metodo_pago.slice(1);
@@ -623,7 +773,9 @@ async function reservarTurno() {
         const resultado = await respuesta.json();
 
         if(resultado.resultado) {
-            // Construir mensaje de WhatsApp
+            // Calcular duración total y hora fin estimada
+            const duracionTotalMin = servicios.reduce((sum, s) => sum + parseInt(s.duracion || 30), 0);
+            const horaFin = calcularHoraFin(hora, duracionTotalMin);
             const nombresServicios = servicios.map(s => s.nombre).join(', ');
             const total = servicios.reduce((sum, s) => sum + parseInt(s.precio), 0);
 
@@ -636,7 +788,7 @@ async function reservarTurno() {
 
             const metodoFormateado = metodo_pago.charAt(0).toUpperCase() + metodo_pago.slice(1);
             const nombreProf = peluquero.esPrimero ? `Primero disponible ${peluquero.apellido}` : `${peluquero.nombre} ${peluquero.apellido}`;
-            const mensaje = `Hola! Me gustaría reservar un turno.\nNombre: ${nombre}\nProfesional: ${nombreProf}\nServicios: ${nombresServicios}\nFecha: ${fechaLegible} a las ${hora}hs\nMétodo de Pago: ${metodoFormateado}\nTotal a pagar: $${total}`;
+            const mensaje = `Hola! Me gustaría reservar un turno.\nNombre: ${nombre}\nProfesional: ${nombreProf}\nServicios: ${nombresServicios}\nFecha: ${fechaLegible}\nHorario: ${hora} a ${horaFin}hs (${formatearDuracion(duracionTotalMin)})\nMétodo de Pago: ${metodoFormateado}\nTotal a pagar: $${total}`;
 
             const telefonoPeluquero = peluquero.telefono ? peluquero.telefono.replace(/\D/g, '') : '';
             const urlWhatsApp = `https://wa.me/549${telefonoPeluquero}?text=${encodeURIComponent(mensaje)}`;

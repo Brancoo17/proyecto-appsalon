@@ -7,16 +7,18 @@ use Override;
 class Servicio extends ActiveRecord {
     // Base de Datos
     protected static string $tabla = 'servicios';
-    protected static array $columnasDB = ['id', 'nombre', 'precio'];
+    protected static array $columnasDB = ['id', 'nombre', 'precio', 'duracion'];
 
     public ?int $id;
     public string $nombre;
     public string $precio;
+    public ?int $duracion;
 
     public function __construct($args = []) {
         $this->id = $args['id'] ?? null;
         $this->nombre = $args['nombre'] ?? '';
         $this->precio = $args['precio'] ?? '';
+        $this->duracion = isset($args['duracion']) ? (int)$args['duracion'] : 30;
     }
 
     #[Override]
@@ -35,6 +37,10 @@ class Servicio extends ActiveRecord {
 
         if(!is_numeric($this->precio)) {
             self::$alertas['error'][] = 'El precio debe ser un número';
+        }
+
+        if(!$this->duracion || !is_numeric($this->duracion) || $this->duracion <= 0) {
+            self::$alertas['error'][] = 'La duración debe ser un número mayor a 0 (minutos)';
         }
 
         return self::$alertas;

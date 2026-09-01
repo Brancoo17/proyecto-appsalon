@@ -3,9 +3,7 @@
 
 <?php include_once __DIR__ . '/../templates/barra.php'; ?>
 
-<h1 class="nombre-pagina">Panel de Peluquero</h1>
-
-<h3>Mis Turnos Asignados</h3>
+<h2>Buscar Mis Turnos</h2>
 <div class="busqueda">
     <form class="formulario">
         <div class="campo">
@@ -23,6 +21,7 @@
             $turnosAgrupados[$t->id] = [
                 'id' => $t->id,
                 'hora' => substr($t->hora, 0, 5),
+                'duracionTotal' => 0,
                 'cliente' => $t->cliente,
                 'email' => $t->email,
                 'telefono' => $t->telefono,
@@ -33,12 +32,23 @@
             ];
         }
         if(!empty($t->servicio)) {
+            $dur = (int)($t->duracion ?? 30);
             $turnosAgrupados[$t->id]['servicios'][] = [
                 'nombre' => $t->servicio,
-                'precio' => $t->precio
+                'precio' => $t->precio,
+                'duracion' => $dur
             ];
+            $turnosAgrupados[$t->id]['duracionTotal'] += $dur;
             $turnosAgrupados[$t->id]['total'] += floatval($t->precio);
         }
+    }
+
+    // Calcular hora de finalización para cada turno
+    foreach($turnosAgrupados as $id => $turnoItem) {
+        $duracionMin = max(30, $turnoItem['duracionTotal']);
+        $horaInicioSeg = strtotime("2000-01-01 " . $turnoItem['hora']);
+        $horaFinSeg = $horaInicioSeg + ($duracionMin * 60);
+        $turnosAgrupados[$id]['hora_fin'] = date('H:i', $horaFinSeg);
     }
 ?>
 
@@ -51,7 +61,7 @@
         <table class="tabla-admin">
             <thead>
                 <tr>
-                    <th>Hora</th>
+                    <th>Horario</th>
                     <th>Cliente</th>
                     <th>Servicios</th>
                     <th>Pago</th>
@@ -63,7 +73,7 @@
                 <?php foreach($turnosAgrupados as $turno): ?>
                     <tr>
                         <td class="col-hora">
-                            <span class="badge-hora"><i class="fa-regular fa-clock"></i> <?php echo s($turno['hora']); ?></span>
+                            <span class="badge-hora"><i class="fa-regular fa-clock"></i> <?php echo s($turno['hora']); ?> - <?php echo s($turno['hora_fin']); ?></span>
                         </td>
                         <td class="col-cliente">
                             <strong class="cliente-nombre"><?php echo s($turno['cliente']); ?></strong>

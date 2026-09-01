@@ -17,6 +17,10 @@ class ActiveRecord {
         self::$db = $database;
     }
 
+    public static function getDB(): \mysqli {
+        return self::$db;
+    }
+
     public static function setAlerta(string $tipo, string $mensaje) {
         static::$alertas[$tipo][] = $mensaje;
     }
