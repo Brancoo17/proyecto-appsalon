@@ -251,39 +251,28 @@ class APIController {
 
     public static function guardar() {
         $usuario_id = $_POST['usuario_id'] ?? null;
-        $nombre = $_POST['nombre'] ?? '';
-        $telefono = $_POST['telefono'] ?? '';
+        $nombre = trim($_POST['nombre'] ?? '');
+        $telefono = trim($_POST['telefono'] ?? '');
 
         // Si no viene usuario_id o está vacío (es un turno de invitado)
         if(empty($usuario_id)) {
-            $usuarioExistente = null;
+            $partesNombre = explode(' ', $nombre, 2);
+            $nombreP = !empty($partesNombre[0]) ? $partesNombre[0] : 'Invitado';
+            $apellidoP = $partesNombre[1] ?? '';
 
-            // Buscar si ya existe un cliente con ese teléfono
-            if(!empty($telefono)) {
-                $usuarioExistente = Usuario::where('telefono', $telefono);
-            }
+            // Crear un registro específico para el invitado sin email
+            $nuevoUsuario = new Usuario([
+                'nombre' => $nombreP,
+                'apellido' => $apellidoP,
+                'telefono' => $telefono,
+                'email' => '',
+                'password' => '',
+                'admin' => 0,
+                'confirmado' => 1
+            ]);
 
-            if($usuarioExistente) {
-                $usuario_id = $usuarioExistente->id;
-            } else {
-                // Crear un registro rápido en la tabla usuarios para el invitado
-                $partesNombre = explode(' ', trim($nombre), 2);
-                $nombreP = $partesNombre[0] ?? 'Invitado';
-                $apellidoP = $partesNombre[1] ?? '';
-
-                $nuevoUsuario = new Usuario([
-                    'nombre' => $nombreP,
-                    'apellido' => $apellidoP,
-                    'telefono' => $telefono,
-                    'email' => '',
-                    'password' => '',
-                    'admin' => 0,
-                    'confirmado' => 1
-                ]);
-
-                $resUsuario = $nuevoUsuario->guardar();
-                $usuario_id = $resUsuario['id'] ?? null;
-            }
+            $resUsuario = $nuevoUsuario->guardar();
+            $usuario_id = $resUsuario['id'] ?? null;
 
             $_POST['usuario_id'] = $usuario_id;
         }

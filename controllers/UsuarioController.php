@@ -92,6 +92,7 @@ class UsuarioController {
         }
 
         if($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $passwordActual = $usuario->password;
             $usuario->sincronizar($_POST);
 
             // Validar campos básicos
@@ -108,10 +109,13 @@ class UsuarioController {
                 $alertas['error'][] = 'El teléfono es obligatorio';
             }
 
-            // Validar cambio de contraseña opcional
-            if(!empty($_POST['password'])) {
+            // Validar cambio de contraseña opcional o conservar la contraseña actual
+            if(empty($_POST['password'])) {
+                $usuario->password = $passwordActual;
+            } else {
                 if(strlen($_POST['password']) < 6) {
                     $alertas['error'][] = 'La nueva contraseña debe tener al menos 6 caracteres';
+                    $usuario->password = $passwordActual;
                 } else {
                     $usuario->password = $_POST['password'];
                     $usuario->hashPassword();

@@ -123,7 +123,7 @@
                             <span class="servicio-precio">$<?php echo s($servicio->precio); ?></span>
                         </div>
                         <p class="servicio-detalle">Cuidado completo, acabado profesional y asesoramiento de imagen.</p>
-                        <a href="/turno" class="boton-servicio">Reservar Este Servicio &rarr;</a>
+                        <a href="/turno?servicio=<?php echo $servicio->id; ?>" class="boton-servicio">Reservar Este Servicio &rarr;</a>
                     </div>
                 <?php endforeach; ?>
             </div>

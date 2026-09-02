@@ -178,6 +178,15 @@ function mostrarServicios(servicios) {
         document.querySelector('.listado-servicios').appendChild(servicioDiv);
     });
 
+    // Comprobar si viene un servicio preseleccionado por URL (?servicio=ID)
+    const urlParams = new URLSearchParams(window.location.search);
+    const servicioIdParam = urlParams.get('servicio');
+    if(servicioIdParam) {
+        const servicioPreseleccionado = servicios.find(s => String(s.id) === String(servicioIdParam));
+        if(servicioPreseleccionado) {
+            seleccionarServicio(servicioPreseleccionado);
+        }
+    }
 }
 
 function seleccionarServicio(servicio) {

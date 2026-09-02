@@ -153,8 +153,9 @@ class PeluqueroController {
         $peluqueroId = $_SESSION['id'];
 
         // Consultar turnos asignados únicamente a este peluquero
-        $consulta = "SELECT turnos.id, turnos.hora, CONCAT(usuarios.nombre, ' ', usuarios.apellido) as cliente, ";
-        $consulta .= " usuarios.email, usuarios.telefono, servicios.nombre as servicio, servicios.precio, ";
+        $consulta = "SELECT turnos.id, turnos.hora, TRIM(CONCAT(COALESCE(usuarios.nombre, 'Invitado'), ' ', COALESCE(usuarios.apellido, ''))) as cliente, ";
+        $consulta .= " COALESCE(usuarios.email, '') as email, COALESCE(usuarios.telefono, '') as telefono, ";
+        $consulta .= " servicios.nombre as servicio, servicios.precio, ";
         $consulta .= " COALESCE(servicios.duracion, 30) as duracion, ";
         $consulta .= " CONCAT(peluqueros.nombre, ' ', peluqueros.apellido) as peluquero, ";
         $consulta .= " turnos.estado, turnos.metodo_pago ";

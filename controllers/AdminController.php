@@ -21,9 +21,9 @@ class AdminController {
         // Consultar la base de datos
         $consulta = "SELECT turnos.id,
                             turnos.hora,
-                            CONCAT(usuarios.nombre, ' ', usuarios.apellido) as cliente,
-                            usuarios.email,
-                            usuarios.telefono,
+                            TRIM(CONCAT(COALESCE(usuarios.nombre, 'Invitado'), ' ', COALESCE(usuarios.apellido, ''))) as cliente,
+                            COALESCE(usuarios.email, '') as email,
+                            COALESCE(usuarios.telefono, '') as telefono,
                             servicios.nombre as servicio,
                             servicios.precio,
                             COALESCE(servicios.duracion, 30) as duracion,
