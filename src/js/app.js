@@ -132,7 +132,7 @@ function paginaSiguiente() {
 async function consultarAPI() {
 
     try {
-        const url = 'http://localhost:3000/api/servicios';
+        const url = '/api/servicios';
         const resultado = await fetch(url);
         const servicios = await resultado.json();
         mostrarServicios(servicios);
@@ -400,7 +400,7 @@ function seleccionarFecha() {
 // Carga la lista completa de peluqueros
 async function consultarPeluqueros() {
     try {
-        const url = 'http://localhost:3000/api/peluqueros';
+        const url = '/api/peluqueros';
         const resultado = await fetch(url);
         todosPeluqueros = await resultado.json();
     } catch (error) {
@@ -412,7 +412,7 @@ async function consultarPeluqueros() {
 async function obtenerHorasDisponiblesDia(fecha) {
     try {
         const serviciosIds = turno.servicios.map(s => s.id).join(',');
-        const url = `http://localhost:3000/api/disponibilidad?fecha=${fecha}&servicios=${serviciosIds}`;
+        const url = `/api/disponibilidad?fecha=${fecha}&servicios=${serviciosIds}`;
         const resultado = await fetch(url);
         disponibilidadData = await resultado.json();
 
@@ -816,7 +816,7 @@ async function reservarTurno() {
 
     try {
         // Petición a la API
-        const url = 'http://localhost:3000/api/turnos';
+        const url = '/api/turnos';
 
         const respuesta = await fetch(url, {
             method: 'POST',

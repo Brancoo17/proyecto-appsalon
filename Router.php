@@ -2,33 +2,21 @@
 
 namespace MVC;
 
-class Router
-{
+class Router {
     public array $getRoutes = [];
     public array $postRoutes = [];
 
-    public function get($url, $fn)
-    {
+    public function get($url, $fn) {
         $this->getRoutes[$url] = $fn;
     }
 
-    public function post($url, $fn)
-    {
+    public function post($url, $fn) {
         $this->postRoutes[$url] = $fn;
     }
 
-    public function comprobarRutas()
-    {
-        
-        // Proteger Rutas...
-        session_start();
+    public function comprobarRutas() {
 
-        // Arreglo de rutas protegidas...
-        // $rutas_protegidas = ['/admin', '/propiedades/crear', '/propiedades/actualizar', '/propiedades/eliminar', '/vendedores/crear', '/vendedores/actualizar', '/vendedores/eliminar'];
-
-        // $auth = $_SESSION['login'] ?? null;
-
-        $currentUrl = $_SERVER['PATH_INFO'] ?? '/';
+        $currentUrl = strtok($_SERVER['REQUEST_URI'], '?') ?? '/';
         $method = $_SERVER['REQUEST_METHOD'];
 
         if ($method === 'GET') {
@@ -46,8 +34,7 @@ class Router
         }
     }
 
-    public function render($view, $datos = [])
-    {
+    public function render($view, $datos = []) {
 
         // Leer lo que le pasamos  a la vista
         foreach ($datos as $key => $value) {
