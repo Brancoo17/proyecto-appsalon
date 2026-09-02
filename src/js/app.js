@@ -439,22 +439,28 @@ function mostrarHorasGrid(data) {
     const contenedorHoras = document.querySelector('#horas');
     contenedorHoras.innerHTML = '';
 
-    const horasEstablecimiento = [
-        "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", 
-        "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", 
-        "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", 
-        "19:00", "19:30", "20:00", "20:30", "21:00"
-    ];
+    // Obtener horas generadas dinámicamente desde la API (intervalos de 15 minutos)
+    const horasEstablecimiento = data.todasLasHoras || Object.keys(data.peluquerosPorHora || {}) || [];
 
     const horasOcupadas = data.horasOcupadas || [];
 
+    const ahora = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    const hoyStr = `${ahora.getFullYear()}-${pad(ahora.getMonth() + 1)}-${pad(ahora.getDate())}`;
+    const esHoy = (turno.fecha === hoyStr);
+    const ahoraMin = (ahora.getHours() * 60) + ahora.getMinutes();
+
     horasEstablecimiento.forEach(hora => {
+        const [h, m] = hora.split(':').map(Number);
+        const slotMin = (h * 60) + (m || 0);
+        const esPasada = esHoy && (slotMin <= ahoraMin);
+
         const botonHora = document.createElement('BUTTON');
         botonHora.type = 'button';
         botonHora.textContent = hora;
         botonHora.classList.add('hora-boton');
 
-        if (horasOcupadas.includes(hora)) {
+        if (horasOcupadas.includes(hora) || esPasada) {
             botonHora.disabled = true;
             botonHora.classList.add('ocupada');
         } else {
@@ -507,35 +513,73 @@ function botonModalPeluqueros() {
             return;
         }
 
-        // Construir opciones para el SweetAlert2
-        const inputOptions = {
-            'primero_disponible': '✨ Primero disponible (Cualquier profesional)'
-        };
+        const valorActual = (turno.peluquero && !turno.peluquero.esPrimero) ? String(turno.peluquero.id) : 'primero_disponible';
+
+        // Construir opciones con checkboxes seleccionables
+        let htmlPeluqueros = `
+            <p class="modal-subtitulo-peluqueros">Selecciona quién deseas que te atienda el <strong>${turno.fecha}</strong> a las <strong>${turno.hora} hs</strong>:</p>
+            <div class="listado-peluqueros-modal">
+                <label class="item-peluquero-check ${valorActual === 'primero_disponible' ? 'activo' : ''}">
+                    <input type="radio" name="modal_peluquero" value="primero_disponible" ${valorActual === 'primero_disponible' ? 'checked' : ''}>
+                    <div class="check-box-custom"><i class="fa-solid fa-check"></i></div>
+                    <div class="info-peluquero-check">
+                        <span class="icono-peluquero">✨</span>
+                        <div class="datos-peluquero">
+                            <strong>Primero disponible</strong>
+                            <small>Cualquier barbero del equipo</small>
+                        </div>
+                    </div>
+                </label>
+        `;
 
         peluquerosDisponibles.forEach(p => {
-            inputOptions[p.id] = `👤 ${p.nombre} ${p.apellido}`;
+            const estaActivo = (valorActual === String(p.id));
+            htmlPeluqueros += `
+                <label class="item-peluquero-check ${estaActivo ? 'activo' : ''}">
+                    <input type="radio" name="modal_peluquero" value="${p.id}" ${estaActivo ? 'checked' : ''}>
+                    <div class="check-box-custom"><i class="fa-solid fa-check"></i></div>
+                    <div class="info-peluquero-check">
+                        <span class="icono-peluquero">👤</span>
+                        <div class="datos-peluquero">
+                            <strong>${p.nombre} ${p.apellido}</strong>
+                            <small>Barbero profesional</small>
+                        </div>
+                    </div>
+                </label>
+            `;
         });
 
-        const valorActual = (turno.peluquero && !turno.peluquero.esPrimero) ? turno.peluquero.id : 'primero_disponible';
+        htmlPeluqueros += `</div>`;
 
         const { value: seleccion } = await Swal.fire({
-            title: 'Elige tu Profesional',
-            text: `Profesionales disponibles para el ${turno.fecha} a las ${turno.hora}hs:`,
-            input: 'select',
-            inputOptions: inputOptions,
-            inputValue: valorActual,
+            title: 'Elige tu Barbero',
+            html: htmlPeluqueros,
             showCancelButton: true,
-            confirmButtonText: 'Confirmar',
+            confirmButtonText: 'Confirmar Barbero',
             cancelButtonText: 'Cancelar',
             confirmButtonColor: '#0da6f3',
             cancelButtonColor: '#64748b',
             customClass: {
                 popup: 'mi-alerta'
             },
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'Debes seleccionar una opción';
+            didOpen: () => {
+                const items = document.querySelectorAll('.item-peluquero-check');
+                items.forEach(item => {
+                    item.addEventListener('click', function() {
+                        items.forEach(i => i.classList.remove('activo'));
+                        this.classList.add('activo');
+                        const radio = this.querySelector('input[type="radio"]');
+                        if (radio) radio.checked = true;
+                    });
+                });
+            },
+            preConfirm: () => {
+                const seleccionado = document.querySelector('input[name="modal_peluquero"]:checked');
+                if (!seleccionado) {
+                    Swal.showValidationMessage('Por favor, selecciona un barbero');
+                    return false;
                 }
+                return seleccionado.value;
             }
         });
 

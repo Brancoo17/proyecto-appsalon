@@ -102,12 +102,15 @@ class APIController {
             return;
         }
 
-        $horasEstablecimiento = [
-            "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", 
-            "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", 
-            "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", 
-            "19:00", "19:30", "20:00", "20:30", "21:00"
-        ];
+        // 1. Generar intervalos de 15 minutos entre las 10:00 y las 21:00
+        $horasEstablecimiento = [];
+        $inicioMin = 10 * 60; // 10:00 -> 600 min
+        $finMin = 21 * 60;    // 21:00 -> 1260 min
+        for ($m = $inicioMin; $m <= $finMin; $m += 15) {
+            $h = floor($m / 60);
+            $min = $m % 60;
+            $horasEstablecimiento[] = sprintf('%02d:%02d', $h, $min);
+        }
 
         // 2. Obtener todos los peluqueros
         $peluqueros = Peluquero::all();
@@ -197,10 +200,20 @@ class APIController {
         $horasOcupadas = [];
         $peluquerosPorHora = [];
 
+        $esHoy = ($fecha === date('Y-m-d'));
+        $ahoraMin = ((int)date('H') * 60) + (int)date('i');
+
         foreach($horasEstablecimiento as $horaStr) {
             $partesSlot = explode(':', $horaStr);
             $slotStartMin = ((int)$partesSlot[0] * 60) + (int)($partesSlot[1] ?? 0);
             $slotEndMin = $slotStartMin + $duracionTotalRequerida;
+
+            // Si la fecha es hoy y la hora del slot ya pasó o es la actual, marcar como no disponible
+            if($esHoy && $slotStartMin <= $ahoraMin) {
+                $horasOcupadas[] = $horaStr;
+                $peluquerosPorHora[$horaStr] = [];
+                continue;
+            }
 
             $disponiblesEnEstaHora = [];
 
@@ -242,6 +255,7 @@ class APIController {
         }
 
         echo json_encode([
+            'todasLasHoras' => $horasEstablecimiento,
             'horasDisponibles' => $horasDisponibles,
             'horasOcupadas' => $horasOcupadas,
             'peluquerosPorHora' => $peluquerosPorHora,

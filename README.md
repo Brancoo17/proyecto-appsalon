@@ -18,8 +18,8 @@ Un sistema web completo, moderno y responsive para la administración integral d
   - Selección de múltiples servicios con indicación visual de precio y duración (`⏱️ min`).
   - **Carrito de Servicios Flotante:** Badge con contador y monto en tiempo real. Abre un modal interactivo para revisar el tiempo total estimado, eliminar servicios o avanzar directamente al siguiente paso.
 - **Paso 2 - Fecha, Horarios y Profesionales:**
-  - Grilla interactiva de horarios que calcula la **duración total acumulada** de los servicios seleccionados.
-  - **Algoritmo de disponibilidad continua:** Solo habilita los horarios que disponen del tiempo consecutivo suficiente sin colisionar con turnos existentes ni superar la jornada laboral del barbero.
+  - Grilla interactiva de horarios en intervalos de **15 minutos** que calcula la **duración total acumulada** de los servicios seleccionados (15, 30, 45, 60, 75, 90, 120 min).
+  - **Algoritmo de disponibilidad continua:** Solo habilita los horarios que disponen del tiempo consecutivo suficiente sin colisionar con turnos existentes ni superar la jornada laboral del barbero, eliminando tiempos muertos.
   - Modal para elegir profesional ("Primero disponible" con asignación automática o selección específica de un barbero).
   - Selección de método de pago (*Efectivo* o *Transferencia bancaria*).
   - Compatibilidad para clientes registrados y reservas como **Invitado**.
