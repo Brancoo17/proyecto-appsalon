@@ -122,7 +122,12 @@ $meses = [
 
                     <div class="campo-perfil">
                         <label for="password">Nueva Contraseña (Opcional):</label>
-                        <input type="password" id="password" name="password" placeholder="Dejar en blanco para mantener la actual">
+                        <div class="contenedor-input-password">
+                            <input type="password" id="password" name="password" placeholder="Dejar en blanco para mantener la actual">
+                            <button type="button" class="btn-toggle-password" tabindex="-1" title="Mostrar u ocultar contraseña">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="acciones-formulario-perfil">

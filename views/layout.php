@@ -29,6 +29,23 @@
     <?php endif; ?>
 
     <?php echo $script ?? '' ?>
+
+    <script>
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.btn-toggle-password');
+            if (!btn) return;
+            const container = btn.closest('.contenedor-input-password') || btn.parentElement;
+            const input = container ? container.querySelector('input') : null;
+            if (input) {
+                const isPassword = input.type === 'password';
+                input.type = isPassword ? 'text' : 'password';
+                const icon = btn.querySelector('i');
+                if (icon) {
+                    icon.className = isPassword ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye';
+                }
+            }
+        });
+    </script>
             
 </body>
 </html>

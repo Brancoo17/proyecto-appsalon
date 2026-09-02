@@ -79,3 +79,41 @@
         cursor: pointer;
     }
 }
+
+.contenedor-input-password {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    flex: 1;
+
+    input {
+        width: 100%;
+        padding-right: 4.6rem !important;
+    }
+
+    .btn-toggle-password {
+        position: absolute;
+        right: 1.2rem;
+        background: transparent;
+        border: none;
+        color: #94a3b8;
+        font-size: 1.6rem;
+        cursor: pointer;
+        padding: 0.6rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.2s ease, transform 0.2s ease;
+        line-height: 1;
+
+        &:hover {
+            color: v.$azul;
+            transform: scale(1.15);
+        }
+
+        &:focus {
+            outline: none;
+        }
+    }
+}

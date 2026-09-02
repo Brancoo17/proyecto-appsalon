@@ -14,12 +14,22 @@
 <form class="formulario" method="POST">
     <div class="campo">
         <label for="password">Password:</label>
-        <input type="password" id="password" name="password" placeholder="Tu Nuevo Password">
+        <div class="contenedor-input-password">
+            <input type="password" id="password" name="password" placeholder="Tu Nuevo Password">
+            <button type="button" class="btn-toggle-password" tabindex="-1" title="Mostrar u ocultar contraseña">
+                <i class="fa-regular fa-eye"></i>
+            </button>
+        </div>
     </div>
 
     <div class="campo">
         <label for="password2">Confirmar Password:</label>
-        <input type="password" id="password2" name="password2" placeholder="Confirma tu Password">
+        <div class="contenedor-input-password">
+            <input type="password" id="password2" name="password2" placeholder="Confirma tu Password">
+            <button type="button" class="btn-toggle-password" tabindex="-1" title="Mostrar u ocultar contraseña">
+                <i class="fa-regular fa-eye"></i>
+            </button>
+        </div>
     </div>
 
     <input type="submit" class="boton" value="Guardar Nuevo Password">

@@ -22,7 +22,12 @@
 
     <div class="campo">
         <label for="password">Password:</label>
-        <input type="password" id="password" placeholder="Tu Password" name="password">
+        <div class="contenedor-input-password">
+            <input type="password" id="password" placeholder="Tu Password" name="password">
+            <button type="button" class="btn-toggle-password" tabindex="-1" title="Mostrar u ocultar contraseña">
+                <i class="fa-regular fa-eye"></i>
+            </button>
+        </div>
     </div>
 
     <input type="submit" class="boton" value="Iniciar Sesión">
