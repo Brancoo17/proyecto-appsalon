@@ -41,6 +41,23 @@ class Peluquero extends ActiveRecord {
         return self::$alertas;
     }
 
+    // Validación para cuando se actualiza un peluquero existente (password opcional)
+    public function validarActualizar() : array {
+        if(!$this->nombre) {
+            self::$alertas['error'][] = 'El Nombre del peluquero es obligatorio';
+        }
+        if(!$this->apellido) {
+            self::$alertas['error'][] = 'El Apellido del peluquero es obligatorio';
+        }
+        if(!$this->email) {
+            self::$alertas['error'][] = 'El Email es obligatorio';
+        }
+        if(!empty($this->password) && strlen($this->password) < 6) {
+            self::$alertas['error'][] = 'El Password debe contener al menos 6 caracteres';
+        }
+        return self::$alertas;
+    }
+
     // Hashear password antes de guardar
     public function hashPassword() : void {
         $this->password = password_hash($this->password, PASSWORD_BCRYPT);

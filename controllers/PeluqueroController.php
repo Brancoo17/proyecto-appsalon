@@ -92,16 +92,17 @@ class PeluqueroController {
             $passwordActual = $peluquero->password;
             $peluquero->sincronizar($_POST);
 
-            // Si no envió nuevo password, conservar el actual
-            if(empty($_POST['password'])) {
-                $peluquero->password = $passwordActual;
-            } else {
-                $peluquero->hashPassword();
-            }
-
-            $alertas = $peluquero->validar();
+            // Validar campos
+            $alertas = $peluquero->validarActualizar();
 
             if(empty($alertas)) {
+                // Si no envió nuevo password, conservar el actual; sino, hashearlo
+                if(empty($_POST['password'])) {
+                    $peluquero->password = $passwordActual;
+                } else {
+                    $peluquero->hashPassword();
+                }
+
                 $peluquero->guardar();
                 // Sincronizar servicios y horarios asignados
                 $peluquero->sincronizarServicios($_POST['servicios'] ?? []);
