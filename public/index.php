@@ -10,11 +10,17 @@ use Controllers\AdminController;
 use Controllers\ServicioController;
 use Controllers\PeluqueroController;
 use Controllers\PaginasController;
+use Controllers\UsuarioController;
 
 $router = new Router();
 
 // Página Principal (Landing Page)
 $router->get('/', [PaginasController::class, 'index']);
+
+// Mi Cuenta / Perfil de Usuario
+$router->get('/usuario', [UsuarioController::class, 'index']);
+$router->post('/usuario', [UsuarioController::class, 'index']);
+$router->post('/usuario/cancelar-turno', [UsuarioController::class, 'cancelarTurno']);
 
 // Login & Autenticación
 $router->get('/login', [LoginController::class, 'login']);

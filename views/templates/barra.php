@@ -19,10 +19,16 @@
     </div>
 
     <?php if(isset($_SESSION['login']) && $_SESSION['login']): ?>
-        <a class="boton-barra boton-barra--logout" href="/logout">
-            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-            <span>Cerrar Sesión</span>
-        </a>
+        <div class="acciones-barra-usuario">
+            <a class="boton-barra boton-barra--cuenta" href="/usuario">
+                <i class="fa-solid fa-user-gear"></i>
+                <span>Mi Cuenta</span>
+            </a>
+            <a class="boton-barra boton-barra--logout" href="/logout">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
     <?php else: ?>
         <a class="boton-barra boton-barra--login" href="/login">
             <i class="fa-solid fa-arrow-right-to-bracket"></i>
