@@ -15,21 +15,33 @@ function s(string $html) : string {
 
 // Función que revisa que el usuario esté autenticado
 function isAuth() : void {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
     if(!isset($_SESSION['login'])) {
         header('Location: /login');
+        exit;
     }
 }
 
 function isAdmin() : void {
-    if(!isset($_SESSION['admin'])) {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    if(!isset($_SESSION['admin']) || !$_SESSION['admin']) {
         header('Location: /');
+        exit;
     }
 }
 
 // Función que revisa que el peluquero esté autenticado
 function isPeluquero() : void {
-    if(!isset($_SESSION['peluquero'])) {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    if(!isset($_SESSION['peluquero']) || !$_SESSION['peluquero']) {
         header('Location: /');
+        exit;
     }
 }
 

@@ -15,8 +15,14 @@ class Router {
     }
 
     public function comprobarRutas() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
 
         $currentUrl = strtok($_SERVER['REQUEST_URI'], '?') ?? '/';
+        if ($currentUrl !== '/' && str_ends_with($currentUrl, '/')) {
+            $currentUrl = rtrim($currentUrl, '/');
+        }
         $method = $_SERVER['REQUEST_METHOD'];
 
         if ($method === 'GET') {

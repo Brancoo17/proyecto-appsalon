@@ -23,39 +23,64 @@ class LoginController {
             $auth = new Usuario($_POST);
             $alertas = $auth->validarLogin();
             if(empty($alertas)) {
-                // 1. Intentar buscar en tabla 'usuarios'
+                // 1. Intentar buscar en tabla 'usuarios' (Clientes y Admin)
                 $usuario = Usuario::where('email', $auth->email);
+
                 if($usuario) {
-                    // Verificar password de usuario/admin
-                    $verificado = $usuario->comprobarPasswordAndVerificado($auth->password);
-                    if($verificado) {
-                        session_start();
-                        $_SESSION['id'] = $usuario->id;
-                        $_SESSION['nombre'] = $usuario->nombre . " " . $usuario->apellido;
-                        $_SESSION['email'] = $usuario->email;
-                        $_SESSION['telefono'] = $usuario->telefono ?? '';
-                        $_SESSION['login'] = true;
-                        if($usuario->admin === 1) {
-                            $_SESSION['admin'] = $usuario->admin ?? null;
+                    if((int)$usuario->admin === 1) {
+                        // Es Administrador
+                        $verificado = $usuario->comprobarPasswordAndVerificado($auth->password);
+                        if($verificado) {
+                            if(session_status() === PHP_SESSION_NONE) session_start();
+                            $_SESSION['id'] = $usuario->id;
+                            $_SESSION['nombre'] = $usuario->nombre . " " . $usuario->apellido;
+                            $_SESSION['email'] = $usuario->email;
+                            $_SESSION['telefono'] = $usuario->telefono ?? '';
+                            $_SESSION['login'] = true;
+                            $_SESSION['admin'] = true;
                             header('Location: /admin');
-                        } else {
-                            header('Location: /turno');
+                            exit;
                         }
-                        return;
+                    } else {
+                        // Puede ser un peluquero registrado o un cliente
+                        $peluquero = Peluquero::where('email', $auth->email);
+                        if($peluquero && $peluquero->comprobarPassword($auth->password)) {
+                            if(session_status() === PHP_SESSION_NONE) session_start();
+                            $_SESSION['id'] = $peluquero->id;
+                            $_SESSION['nombre'] = $peluquero->nombre . " " . $peluquero->apellido;
+                            $_SESSION['email'] = $peluquero->email;
+                            $_SESSION['login'] = true;
+                            $_SESSION['peluquero'] = true;
+                            header('Location: /peluquero');
+                            exit;
+                        }
+
+                        // Si no coincide como peluquero, verificar como cliente normal
+                        $verificado = $usuario->comprobarPasswordAndVerificado($auth->password);
+                        if($verificado) {
+                            if(session_status() === PHP_SESSION_NONE) session_start();
+                            $_SESSION['id'] = $usuario->id;
+                            $_SESSION['nombre'] = $usuario->nombre . " " . $usuario->apellido;
+                            $_SESSION['email'] = $usuario->email;
+                            $_SESSION['telefono'] = $usuario->telefono ?? '';
+                            $_SESSION['login'] = true;
+                            header('Location: /turno');
+                            exit;
+                        }
                     }
                 } else {
                     // 2. Si no es usuario cliente, buscar en tabla 'peluqueros'
                     $peluquero = Peluquero::where('email', $auth->email);
                     if($peluquero) {
                         if($peluquero->comprobarPassword($auth->password)) {
-                            session_start();
+                            if(session_status() === PHP_SESSION_NONE) session_start();
                             $_SESSION['id'] = $peluquero->id;
                             $_SESSION['nombre'] = $peluquero->nombre . " " . $peluquero->apellido;
                             $_SESSION['email'] = $peluquero->email;
                             $_SESSION['login'] = true;
                             $_SESSION['peluquero'] = true; // <--- Identificador de rol
                             header('Location: /peluquero');
-                            return;
+                            exit;
                         }
                     } else {
                         Usuario::setAlerta('error', 'Usuario no encontrado');
