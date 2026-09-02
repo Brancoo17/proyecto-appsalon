@@ -39,6 +39,10 @@ class ActiveRecord {
     public static function consultarSQL(string $query): array {
         // Consultar la base de datos
         $resultado = self::$db->query($query);
+        if(!$resultado) {
+            error_log("ActiveRecord SQL Error: " . self::$db->error . " | Query: " . $query);
+            return [];
+        }
 
         // Iterar los resultados
         $array = [];

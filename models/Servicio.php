@@ -2,8 +2,6 @@
 
 namespace Model;
 
-use Override;
-
 class Servicio extends ActiveRecord {
     // Base de Datos
     protected static string $tabla = 'servicios';
@@ -21,7 +19,6 @@ class Servicio extends ActiveRecord {
         $this->duracion = isset($args['duracion']) ? (int)$args['duracion'] : 30;
     }
 
-    #[Override]
     public function validar() {
         if(!$this->nombre) {
             self::$alertas['error'][] = 'Nombre del servicio es requerido';

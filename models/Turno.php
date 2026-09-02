@@ -8,12 +8,12 @@ class Turno extends ActiveRecord {
     protected static array $columnasDB = ['id', 'fecha', 'hora', 'usuario_id', 'peluquero_id', 'estado', 'metodo_pago'];
 
     public ?int $id;
-    public string $fecha;
-    public string $hora;
+    public ?string $fecha;
+    public ?string $hora;
     public ?int $usuario_id;
     public ?int $peluquero_id;
-    public string $estado;
-    public string $metodo_pago;
+    public ?string $estado;
+    public ?string $metodo_pago;
 
     public function __construct($args = []) {
         $this->id = $args['id'] ?? null;

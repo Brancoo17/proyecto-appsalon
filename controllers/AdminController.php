@@ -44,7 +44,7 @@ class AdminController {
         $consulta .= " LEFT OUTER JOIN servicios ";
         $consulta .= " ON servicios.id = turnosServicios.servicio_id ";
 
-        $consulta .= " WHERE fecha =  '{$fecha}' ";
+        $consulta .= " WHERE turnos.fecha = '{$fecha}' ";
 
         $turnos = AdminTurno::SQL($consulta);
         
