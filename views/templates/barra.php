@@ -4,10 +4,8 @@
     $uriActual = $_SERVER['REQUEST_URI'] ?? '';
 ?>
 
-<div class="barra-home">
-    <a href="/">
-        <p><i class="fa-solid fa-house"></i> &nbsp;INICIO</p>
-    </a>
+<div class="perfil-navegacion-superior">
+    <a href="/" class="boton-volver-perfil"><i class="fa-solid fa-arrow-left"></i> Volver al Inicio</a>
 </div>
 
 <div class="barra">
