@@ -15,10 +15,12 @@ class PeluqueroController {
         isAdmin();
 
         $peluqueros = Peluquero::all();
+        $resultado = $_GET['resultado'] ?? null;
 
         $router->render('peluqueros/index', [
             'nombre' => $_SESSION['nombre'],
-            'peluqueros' => $peluqueros
+            'peluqueros' => $peluqueros,
+            'resultado' => $resultado
         ]);
     }
 
@@ -52,7 +54,8 @@ class PeluqueroController {
                         $peluquero->sincronizarServicios($_POST['servicios'] ?? []);
                         $peluquero->sincronizarHorarios($_POST['horarios'] ?? []);
 
-                        header('Location: /peluqueros');
+                        header('Location: /peluqueros?resultado=1');
+                        return;
                     }
                 }
             }
@@ -104,7 +107,8 @@ class PeluqueroController {
                 $peluquero->sincronizarServicios($_POST['servicios'] ?? []);
                 $peluquero->sincronizarHorarios($_POST['horarios'] ?? []);
 
-                header('Location: /peluqueros');
+                header('Location: /peluqueros?resultado=2');
+                return;
             }
         }
 
@@ -129,7 +133,8 @@ class PeluqueroController {
             if($peluquero) {
                 $peluquero->eliminar();
             }
-            header('Location: /peluqueros');
+            header('Location: /peluqueros?resultado=3');
+            return;
         }
     }
 

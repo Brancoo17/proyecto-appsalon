@@ -1,9 +1,27 @@
-<?php /** @var array $servicios */ ?>
+<?php 
+/** @var array $servicios */ 
+/** @var string|null $resultado */ 
+$resultado = $resultado ?? $_GET['resultado'] ?? null;
+?>
 
 <?php include_once __DIR__ . '/../templates/barra.php'; ?>
 
 <h1 class="nombre-pagina">Servicios</h1>
 <p class="descripcion-pagina">Administración de Servicios del Salón</p>
+
+<?php if($resultado === '1'): ?>
+    <div class="alerta exito">
+        <i class="fa-solid fa-circle-check"></i> Servicio creado correctamente
+    </div>
+<?php elseif($resultado === '2'): ?>
+    <div class="alerta exito">
+        <i class="fa-solid fa-circle-check"></i> Servicio actualizado correctamente
+    </div>
+<?php elseif($resultado === '3'): ?>
+    <div class="alerta exito">
+        <i class="fa-solid fa-circle-check"></i> Servicio eliminado correctamente
+    </div>
+<?php endif; ?>
 
 <div class="panel-header">
     <h2>Listado de Servicios</h2>

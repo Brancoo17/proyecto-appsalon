@@ -13,10 +13,12 @@ class ServicioController {
         isAdmin();
 
         $servicios = Servicio::all();
+        $resultado = $_GET['resultado'] ?? null;
 
         $router->render('servicios/index', [
             'nombre' => $_SESSION['nombre'],
-            'servicios' => $servicios
+            'servicios' => $servicios,
+            'resultado' => $resultado
         ]);
     }
 
@@ -36,7 +38,8 @@ class ServicioController {
 
             if(empty($alertas)) {
                 $servicio->guardar();
-                header('Location: /servicios');
+                header('Location: /servicios?resultado=1');
+                return;
             }
             
         }
@@ -66,7 +69,8 @@ class ServicioController {
 
             if(empty($alertas)) {
                 $servicio->guardar();
-                header('Location: /servicios');
+                header('Location: /servicios?resultado=2');
+                return;
             }
         }
 
@@ -85,8 +89,11 @@ class ServicioController {
         if($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'];
             $servicio = Servicio::find($id);
-            $servicio->eliminar();
-            header('Location: /servicios');
+            if($servicio) {
+                $servicio->eliminar();
+            }
+            header('Location: /servicios?resultado=3');
+            return;
         }
     }
 
