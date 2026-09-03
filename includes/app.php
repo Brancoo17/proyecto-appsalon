@@ -1,8 +1,12 @@
 <?php 
 use Model\ActiveRecord;
 require __DIR__ . '/../vendor/autoload.php';
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->safeLoad();
+try {
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+    $dotenv->safeLoad();
+} catch (\Throwable $e) {
+    error_log("Error cargando .env: " . $e->getMessage());
+}
 
 require 'funciones.php';
 require 'database.php';
