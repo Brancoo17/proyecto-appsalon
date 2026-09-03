@@ -43,7 +43,9 @@ $router->get('/mensaje', [LoginController::class, 'mensaje']);
 
 // AREA PRIVADA
 $router->get('/turno', [TurnoController::class, 'index']);
+$router->get('/turno/modificar', [TurnoController::class, 'modificar']);
 $router->get('/admin', [AdminController::class, 'index']);
+$router->get('/admin/clientes', [AdminController::class, 'clientes']);
 
 // CRUD de Peluqueros (Solo Administrador)
 $router->get('/peluqueros', [PeluqueroController::class, 'index']);
@@ -63,8 +65,13 @@ $router->get('/api/turnos', [APIController::class, 'turnos']);
 $router->get('/api/disponibilidad', [APIController::class, 'disponibilidad']);
 $router->get('/api/peluqueros', [APIController::class, 'peluqueros']);
 $router->post('/api/turnos', [APIController::class, 'guardar']);
+$router->post('/api/turnos/actualizar', [APIController::class, 'actualizarTurno']);
 $router->post('/api/turnos/estado', [APIController::class, 'cambiarEstado']);
 $router->post('/api/eliminar', [APIController::class, 'eliminar']);
+
+// API de Bloqueo de Horarios (Admin y Peluqueros)
+$router->post('/api/bloqueos', [APIController::class, 'crearBloqueo']);
+$router->post('/api/bloqueos/eliminar', [APIController::class, 'eliminarBloqueo']);
 
 // CRUD de Servicios
 $router->get('/servicios', [ServicioController::class, 'index']);

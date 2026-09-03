@@ -68,6 +68,10 @@ $meses = [
         <div class="alerta exito">
             <i class="fa-solid fa-circle-check"></i> El turno ha sido cancelado correctamente
         </div>
+    <?php elseif($resultado === '3'): ?>
+        <div class="alerta exito">
+            <i class="fa-solid fa-circle-check"></i> El turno ha sido modificado y actualizado correctamente
+        </div>
     <?php endif; ?>
 
     <!-- ALERTAS DE ERROR DE FORMULARIO -->
@@ -221,6 +225,9 @@ $meses = [
 
                                     <?php if($esReservado && !$esPasado): ?>
                                         <div class="pie-turno-item">
+                                            <a href="/turno/modificar?id=<?php echo $turno['id']; ?>" class="btn-modificar-turno-cliente" title="Modificar este turno">
+                                                <i class="fa-solid fa-pen-to-square"></i> Modificar Turno
+                                            </a>
                                             <form action="/usuario/cancelar-turno" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas cancelar este turno?');">
                                                 <input type="hidden" name="id" value="<?php echo $turno['id']; ?>">
                                                 <button type="submit" class="btn-cancelar-turno-cliente">

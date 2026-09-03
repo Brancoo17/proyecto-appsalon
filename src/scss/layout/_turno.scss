@@ -22,6 +22,90 @@
     display: none;
 }
 
+// Banner de Modificación de Turno
+.banner-modificar-turno {
+    background: linear-gradient(135deg, rgba(13, 166, 243, 0.12) 0%, rgba(15, 23, 42, 0.6) 100%);
+    border: 1px solid rgba(13, 166, 243, 0.35);
+    border-radius: 1.4rem;
+    padding: 1.8rem 2.2rem;
+    margin-bottom: 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(10px);
+
+    .banner-modificar-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .banner-modificar-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+        background: rgba(13, 166, 243, 0.2);
+        color: #38bdf8;
+        border: 1px solid rgba(13, 166, 243, 0.4);
+        padding: 0.5rem 1.2rem;
+        border-radius: 2rem;
+        font-size: 1.35rem;
+        font-weight: v.$bold;
+        letter-spacing: 0.03em;
+        align-self: flex-start;
+    }
+
+    .banner-modificar-detalles {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        color: #cbd5e1;
+        font-size: 1.35rem;
+
+        span {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            i {
+                color: v.$azul;
+            }
+
+            strong {
+                color: v.$blanco;
+            }
+        }
+    }
+
+    .boton-volver-modificar {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #cbd5e1;
+        padding: 0.9rem 1.6rem;
+        border-radius: 0.9rem;
+        font-size: 1.35rem;
+        font-weight: v.$bold;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+
+        &:hover {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #f87171;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+        }
+    }
+}
+
 // Botón para volver al inicio
 .boton-volver {
     display: inline-flex;

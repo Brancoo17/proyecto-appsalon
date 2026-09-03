@@ -6,6 +6,7 @@ use MVC\Router;
 use Model\Peluquero;
 use Model\Servicio;
 use Model\AdminTurno;
+use Model\HorarioBloqueado;
 
 class PeluqueroController {
 
@@ -169,9 +170,19 @@ class PeluqueroController {
 
         $turnos = AdminTurno::SQL($consulta);
 
+        // Consultar bloqueos aplicables a este peluquero en la fecha
+        $queryBloqueos = "SELECT horarios_bloqueados.*, ";
+        $queryBloqueos .= "COALESCE(CONCAT(peluqueros.nombre, ' ', peluqueros.apellido), 'Todos los profesionales') as peluquero ";
+        $queryBloqueos .= "FROM horarios_bloqueados ";
+        $queryBloqueos .= "LEFT JOIN peluqueros ON peluqueros.id = horarios_bloqueados.peluquero_id ";
+        $queryBloqueos .= "WHERE horarios_bloqueados.fecha = '{$fecha}' AND (horarios_bloqueados.peluquero_id = " . intval($peluqueroId) . " OR horarios_bloqueados.peluquero_id IS NULL) ";
+        $queryBloqueos .= "ORDER BY horarios_bloqueados.hora_inicio ASC";
+        $bloqueos = HorarioBloqueado::SQL($queryBloqueos);
+
         $router->render('peluquero/index', [
             'nombre' => $_SESSION['nombre'],
             'turnos' => $turnos,
+            'bloqueos' => $bloqueos,
             'fecha' => $fecha
         ]);
     }

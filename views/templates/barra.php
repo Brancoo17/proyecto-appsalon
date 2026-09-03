@@ -2,6 +2,7 @@
     /** @var string $nombre */ 
     $usuarioNombre = $nombre ?? $_SESSION['nombre'] ?? '';
     $uriActual = $_SERVER['REQUEST_URI'] ?? '';
+    $pathActual = parse_url($uriActual, PHP_URL_PATH) ?? '';
 ?>
 
 <div class="perfil-navegacion-superior">
@@ -39,15 +40,19 @@
     <h1 class="nombre-pagina">Panel de Administración</h1>
 
     <nav class="barra-servicios">
-        <a class="boton-nav <?php echo (strpos($uriActual, '/admin') !== false || $uriActual === '/admin') ? 'activo' : ''; ?>" href="/admin">
+        <a class="boton-nav <?php echo ($pathActual === '/admin') ? 'activo' : ''; ?>" href="/admin">
             <i class="fa-solid fa-calendar-check"></i>
             <span>Ver Turnos</span>
         </a>
-        <a class="boton-nav <?php echo (strpos($uriActual, '/servicios') !== false) ? 'activo' : ''; ?>" href="/servicios">
+        <a class="boton-nav <?php echo ($pathActual === '/admin/clientes') ? 'activo' : ''; ?>" href="/admin/clientes">
+            <i class="fa-solid fa-users"></i>
+            <span>Clientes Registrados</span>
+        </a>
+        <a class="boton-nav <?php echo (strpos($pathActual, '/servicios') !== false) ? 'activo' : ''; ?>" href="/servicios">
             <i class="fa-solid fa-scissors"></i>
             <span>Administrar Servicios</span>
         </a>
-        <a class="boton-nav <?php echo (strpos($uriActual, '/peluqueros') !== false) ? 'activo' : ''; ?>" href="/peluqueros">
+        <a class="boton-nav <?php echo (strpos($pathActual, '/peluqueros') !== false) ? 'activo' : ''; ?>" href="/peluqueros">
             <i class="fa-solid fa-users-gear"></i>
             <span>Administrar Peluqueros</span>
         </a>

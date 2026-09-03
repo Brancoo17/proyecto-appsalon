@@ -20,3 +20,4 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Conectarnos a la base de datos
 ActiveRecord::setDB($db);
+\Model\HorarioBloqueado::crearTablaSiNoExiste();

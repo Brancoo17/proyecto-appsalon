@@ -85,7 +85,11 @@ class ActiveRecord {
         $atributos = $this->atributos();
         $sanitizado = [];
         foreach($atributos as $key => $value ) {
-            $sanitizado[$key] = self::$db->escape_string($value);
+            if(is_null($value)) {
+                $sanitizado[$key] = null;
+            } else {
+                $sanitizado[$key] = self::$db->escape_string((string)$value);
+            }
         }
         return $sanitizado;
     }
@@ -152,14 +156,22 @@ class ActiveRecord {
         $atributos = $this->sanitizarAtributos();
 
         // Insertar en la base de datos
-        $query = " INSERT INTO " . static::$tabla . " ( ";
-        $query .= join(', ', array_keys($atributos));
-        $query .= " ) VALUES ('"; 
-        $query .= join("', '", array_values($atributos));
-        $query .= "') ";
+        $columnas = join(', ', array_keys($atributos));
+        $valoresArr = [];
+        foreach($atributos as $valor) {
+            if(is_null($valor)) {
+                $valoresArr[] = "NULL";
+            } else {
+                $valoresArr[] = "'{$valor}'";
+            }
+        }
+        $valores = join(', ', $valoresArr);
+
+        $query = " INSERT INTO " . static::$tabla . " ( {$columnas} ) VALUES ( {$valores} ) ";
 
         // Resultado de la consulta
         $resultado = self::$db->query($query);
+        $this->id = (int)self::$db->insert_id;
         return [
            'resultado' =>  $resultado,
            'id' => self::$db->insert_id
@@ -174,7 +186,11 @@ class ActiveRecord {
         // Iterar para ir agregando cada campo de la BD
         $valores = [];
         foreach($atributos as $key => $value) {
-            $valores[] = "{$key}='{$value}'";
+            if(is_null($value)) {
+                $valores[] = "{$key}=NULL";
+            } else {
+                $valores[] = "{$key}='{$value}'";
+            }
         }
 
         // Consulta SQL

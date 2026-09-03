@@ -25,16 +25,13 @@ document.addEventListener('DOMContentLoaded', function() {
     iniciarApp();
 });
 
-function iniciarApp() {
+async function iniciarApp() {
 
     mostrarSeccion(); // Muestra y oculta las secciones
     tabs(); // Cambia la sección cuando se presionan los tabs
     botonesPaginador(); // Agrega o quita los botones del paginador
     paginaSiguiente();
     paginaAnterior();
-
-    consultarAPI(); // Consulta la API de servicios
-    consultarPeluqueros(); // Carga todos los peluqueros
 
     idCliente();
     nombreCliente(); // Añade el nombre del cliente al objeto de turno
@@ -45,6 +42,17 @@ function iniciarApp() {
     botonModalCarrito(); // Maneja el botón flotante del carrito de servicios
 
     actualizarCarritoUI(); // Inicializa el badge del carrito
+
+    const [servicios, peluqueros] = await Promise.all([
+        consultarAPI(),
+        consultarPeluqueros()
+    ]);
+
+    const inputModificar = document.querySelector('#turno_id_modificar');
+    if(inputModificar && inputModificar.value) {
+        await precargarDatosModificacion(servicios, peluqueros);
+    }
+
     mostrarResumen(); // Muestra el resumen del turno
 }
 
@@ -136,9 +144,10 @@ async function consultarAPI() {
         const resultado = await fetch(url);
         const servicios = await resultado.json();
         mostrarServicios(servicios);
-        
+        return servicios;
     } catch (error) {
         console.log(error);
+        return [];
     }
 
 }
@@ -403,8 +412,10 @@ async function consultarPeluqueros() {
         const url = '/api/peluqueros';
         const resultado = await fetch(url);
         todosPeluqueros = await resultado.json();
+        return todosPeluqueros;
     } catch (error) {
         console.log(error);
+        return [];
     }
 }
 
@@ -412,7 +423,11 @@ async function consultarPeluqueros() {
 async function obtenerHorasDisponiblesDia(fecha) {
     try {
         const serviciosIds = turno.servicios.map(s => s.id).join(',');
-        const url = `/api/disponibilidad?fecha=${fecha}&servicios=${serviciosIds}`;
+        let url = `/api/disponibilidad?fecha=${fecha}&servicios=${serviciosIds}`;
+        const inputModificar = document.querySelector('#turno_id_modificar');
+        if(inputModificar && inputModificar.value) {
+            url += `&turno_id=${inputModificar.value}`;
+        }
         const resultado = await fetch(url);
         disponibilidadData = await resultado.json();
 
@@ -460,10 +475,16 @@ function mostrarHorasGrid(data) {
         botonHora.textContent = hora;
         botonHora.classList.add('hora-boton');
 
-        if (horasOcupadas.includes(hora) || esPasada) {
+        const esHoraActualTurno = (turno.hora && turno.hora === hora);
+
+        if ((horasOcupadas.includes(hora) || esPasada) && !esHoraActualTurno) {
             botonHora.disabled = true;
             botonHora.classList.add('ocupada');
         } else {
+            if (esHoraActualTurno) {
+                botonHora.classList.add('seleccionada');
+            }
+
             botonHora.onclick = function() {
                 const botonSeleccionadoPrevio = document.querySelector('.hora-boton.seleccionada');
                 if (botonSeleccionadoPrevio) {
@@ -781,11 +802,18 @@ function mostrarResumen() {
     const metodoFormateado = metodo_pago.charAt(0).toUpperCase() + metodo_pago.slice(1);
     metodoPagoTurno.innerHTML = `<span>Método de Pago: </span> ${metodoFormateado}`;
 
-    // Botón para crear un turno
-    const botonReservar = document.createElement('button');
-    botonReservar.classList.add('boton');
-    botonReservar.textContent = 'Reservar Turno';
-    botonReservar.onclick = reservarTurno;
+    // Botón para crear un turno o guardar cambios
+    const botonAccion = document.createElement('button');
+    botonAccion.classList.add('boton');
+
+    const inputModificar = document.querySelector('#turno_id_modificar');
+    if(inputModificar && inputModificar.value) {
+        botonAccion.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Cambios';
+        botonAccion.onclick = guardarCambiosTurno;
+    } else {
+        botonAccion.textContent = 'Reservar Turno';
+        botonAccion.onclick = reservarTurno;
+    }
 
     resumen.appendChild(nombreCliente);
     resumen.appendChild(telefonoCliente);
@@ -794,7 +822,7 @@ function mostrarResumen() {
     resumen.appendChild(horaTurno);
     resumen.appendChild(metodoPagoTurno);
 
-    resumen.appendChild(botonReservar);
+    resumen.appendChild(botonAccion);
 }
 
 async function reservarTurno() {
@@ -873,6 +901,209 @@ async function reservarTurno() {
             customClass: {
                 popup: 'mi-alerta'
             }
+        });
+    }
+}
+
+async function precargarDatosModificacion(servicios, peluqueros) {
+    const inputServicios = document.querySelector('#turno_modificar_servicios');
+    const idsServicios = inputServicios ? JSON.parse(inputServicios.value || '[]') : [];
+
+    if(Array.isArray(idsServicios) && idsServicios.length > 0) {
+        servicios.forEach(servicio => {
+            if(idsServicios.includes(parseInt(servicio.id))) {
+                turno.servicios.push(servicio);
+                const divServicio = document.querySelector(`[data-id-servicio="${servicio.id}"]`);
+                if(divServicio) divServicio.classList.add('seleccionado');
+            }
+        });
+        actualizarCarritoUI();
+    }
+
+    const inputFecha = document.querySelector('#fecha');
+    const inputHora = document.querySelector('#hora');
+    const fechaPrev = document.querySelector('#turno_modificar_fecha')?.value || '';
+    const horaPrev = document.querySelector('#turno_modificar_hora')?.value || '';
+    const peluqueroIdPrev = document.querySelector('#turno_modificar_peluquero_id')?.value || '';
+    const metodoPagoPrev = document.querySelector('#turno_modificar_metodo_pago')?.value || 'efectivo';
+
+    if(metodoPagoPrev) {
+        turno.metodo_pago = metodoPagoPrev;
+        const radioPago = document.querySelector(`input[name="metodo_pago"][value="${metodoPagoPrev}"]`);
+        if(radioPago) radioPago.checked = true;
+    }
+
+    if(fechaPrev) {
+        turno.fecha = fechaPrev;
+        if(inputFecha) inputFecha.value = fechaPrev;
+
+        if(horaPrev) {
+            turno.hora = horaPrev;
+            if(inputHora) inputHora.value = horaPrev;
+        }
+
+        await obtenerHorasDisponiblesDia(fechaPrev);
+
+        if(horaPrev) {
+            const botones = document.querySelectorAll('.hora-boton');
+            botones.forEach(b => {
+                if(b.textContent.trim() === horaPrev) {
+                    b.classList.add('seleccionada');
+                    b.disabled = false;
+                    b.classList.remove('ocupada');
+                }
+            });
+
+            if(peluqueroIdPrev && peluqueros && peluqueros.length > 0) {
+                const peluqueroEncontrado = peluqueros.find(p => String(p.id) === String(peluqueroIdPrev));
+                if(peluqueroEncontrado) {
+                    turno.peluquero = {
+                        id: peluqueroEncontrado.id,
+                        nombre: peluqueroEncontrado.nombre,
+                        apellido: peluqueroEncontrado.apellido,
+                        telefono: peluqueroEncontrado.telefono,
+                        esPrimero: false
+                    };
+                    const campoProf = document.querySelector('#campo-profesional');
+                    if(campoProf) campoProf.style.display = 'block';
+                    actualizarUIProfesional();
+                }
+            }
+        }
+    }
+}
+
+async function guardarCambiosTurno() {
+    const inputModificar = document.querySelector('#turno_id_modificar');
+    const turnoId = inputModificar ? inputModificar.value : null;
+    if(!turnoId) return;
+
+    const { id, nombre, telefono, fecha, hora, peluquero, servicios, metodo_pago } = turno;
+
+    if(!nombre || !telefono || !fecha || !hora || !peluquero || !metodo_pago || servicios.length === 0) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Datos Incompletos',
+            text: 'Por favor, completa todos los campos (servicios, fecha, horario y barbero) antes de guardar.',
+            confirmButtonColor: '#0da6f3',
+            customClass: { popup: 'mi-alerta' }
+        });
+        return;
+    }
+
+    const confirmacion = await Swal.fire({
+        title: '¿Guardar Cambios?',
+        text: `Se actualizará el turno #${turnoId} para el ${fecha} a las ${hora} hs.`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: '<i class="fa-solid fa-check"></i> Sí, Guardar Cambios',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#0da6f3',
+        cancelButtonColor: '#64748b',
+        customClass: { popup: 'mi-alerta' }
+    });
+
+    if(!confirmacion.isConfirmed) return;
+
+    const idServicios = servicios.map(servicio => servicio.id);
+
+    const datos = new FormData();
+    datos.append('id', turnoId);
+    datos.append('usuario_id', id);
+    datos.append('nombre', nombre);
+    datos.append('telefono', telefono);
+    datos.append('fecha', fecha);
+    datos.append('hora', hora);
+    datos.append('peluquero_id', peluquero.id);
+    datos.append('metodo_pago', metodo_pago);
+    datos.append('servicios', idServicios.join(','));
+
+    try {
+        const respuesta = await fetch('/api/turnos/actualizar', {
+            method: 'POST',
+            body: datos
+        });
+        const resultado = await respuesta.json();
+
+        if(resultado.resultado) {
+            const esCliente = document.querySelector('#es_cliente')?.value === '1';
+            const redirectTarget = resultado.redirect || document.querySelector('#redirect_url')?.value || '/';
+
+            // Calcular duración total y hora fin estimada
+            const duracionTotalMin = servicios.reduce((sum, s) => sum + parseInt(s.duracion || 30), 0);
+            const horaFin = calcularHoraFin(hora, duracionTotalMin);
+            const nombresServicios = servicios.map(s => s.nombre).join(', ');
+            const total = servicios.reduce((sum, s) => sum + parseInt(s.precio), 0);
+
+            // Formatear fecha legible
+            const [anio, mes, dia] = fecha.split('-');
+            const fechaObj = new Date(Number(anio), Number(mes) - 1, Number(dia));
+            const fechaLegible = fechaObj.toLocaleDateString('es-AR', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            });
+
+            const metodoFormateado = metodo_pago.charAt(0).toUpperCase() + metodo_pago.slice(1);
+            const nombreProf = peluquero.esPrimero ? `Primero disponible ${peluquero.apellido}` : `${peluquero.nombre} ${peluquero.apellido}`;
+            const mensaje = `Hola! Modifiqué mi turno.\n*Modificación de Turno #${turnoId}*\nNombre: ${nombre}\nProfesional: ${nombreProf}\nServicios: ${nombresServicios}\nNueva Fecha: ${fechaLegible}\nNuevo Horario: ${hora} a ${horaFin}hs (${formatearDuracion(duracionTotalMin)})\nMétodo de Pago: ${metodoFormateado}\nTotal a pagar: $${total}`;
+
+            const rawTel = peluquero.telefono ? peluquero.telefono.replace(/\D/g, '') : '';
+            let telefonoPeluquero = rawTel;
+            if(rawTel) {
+                if(rawTel.startsWith('549')) {
+                    telefonoPeluquero = rawTel;
+                } else if(rawTel.startsWith('54')) {
+                    telefonoPeluquero = '549' + rawTel.slice(2);
+                } else {
+                    telefonoPeluquero = '549' + rawTel;
+                }
+            }
+
+            const urlWhatsApp = telefonoPeluquero ? `https://wa.me/${telefonoPeluquero}?text=${encodeURIComponent(mensaje)}` : '';
+
+            if(esCliente && urlWhatsApp) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "¡Turno Modificado!",
+                    text: "Presiona OK para notificar la modificación del turno al barbero por WhatsApp.",
+                    confirmButtonText: '<i class="fa-brands fa-whatsapp"></i> Enviar a WhatsApp',
+                    confirmButtonColor: '#25D366',
+                    customClass: {
+                        popup: 'mi-alerta'
+                    }
+                }).then(() => {
+                    window.open(urlWhatsApp, '_blank');
+                    setTimeout(() => {
+                        window.location.href = redirectTarget;
+                    }, 1000);
+                });
+            } else {
+                await Swal.fire({
+                    icon: 'success',
+                    title: '¡Turno Actualizado!',
+                    text: resultado.mensaje || 'Los cambios se han guardado exitosamente.',
+                    confirmButtonText: 'Aceptar',
+                    confirmButtonColor: '#0da6f3',
+                    customClass: { popup: 'mi-alerta' }
+                });
+                window.location.href = redirectTarget;
+            }
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'No se pudo actualizar',
+                text: resultado.mensaje || 'Ocurrió un error al intentar modificar el turno.',
+                confirmButtonColor: '#0da6f3',
+                customClass: { popup: 'mi-alerta' }
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de Red',
+            text: 'No se pudo conectar con el servidor para guardar las modificaciones.',
+            confirmButtonColor: '#0da6f3',
+            customClass: { popup: 'mi-alerta' }
         });
     }
 }
