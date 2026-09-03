@@ -25,12 +25,14 @@ class Email {
         $mail->SMTPAuth = true;
         $mail->Username = $_ENV['EMAIL_USER'];
         $mail->Password = $_ENV['EMAIL_PASS'] ?? $_ENV['EMAIL_PASSWORD'] ?? '';
-        $mail->SMTPSecure = 'tls';
+        $mail->SMTPSecure = ($_ENV['EMAIL_PORT'] == 465) ? 'ssl' : 'tls';
         $mail->Port = $_ENV['EMAIL_PORT'];
 
         // Configurar el contenido
-        $mail->setFrom('correo@appsalon.com');
-        $mail->addAddress('correo@appsalon.com', 'AppSalon.com');
+        $remitente = $_ENV['EMAIL_USER'] ?? $_ENV['EMAIL_ADDRESS'] ?? $_ENV['EMAIL_ADDRES'] ?? 'tu_correo@gmail.com';
+
+        $mail->setFrom($remitente, 'BarberShop');
+        $mail->addAddress($this->email, $this->nombre);
         $mail->Subject = 'Confirma tu Cuenta';
 
         // Contenido HTML
@@ -60,12 +62,14 @@ class Email {
         $mail->SMTPAuth = true;
         $mail->Username = $_ENV['EMAIL_USER'];
         $mail->Password = $_ENV['EMAIL_PASS'] ?? $_ENV['EMAIL_PASSWORD'] ?? '';
-        $mail->SMTPSecure = 'tls';
+        $mail->SMTPSecure = ($_ENV['EMAIL_PORT'] == 465) ? 'ssl' : 'tls';
         $mail->Port = $_ENV['EMAIL_PORT'];
 
         // Configurar el contenido
-        $mail->setFrom('correo@appsalon.com');
-        $mail->addAddress('correo@appsalon.com', 'AppSalon.com');
+        $remitente = $_ENV['EMAIL_USER'] ?? $_ENV['EMAIL_ADDRESS'] ?? $_ENV['EMAIL_ADDRES'] ?? 'tu_correo@gmail.com';
+
+        $mail->setFrom($remitente, 'BarberShop');
+        $mail->addAddress($this->email, $this->nombre);
         $mail->Subject = 'Reestablece tu Password';
 
         // Contenido HTML
