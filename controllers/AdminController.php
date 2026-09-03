@@ -38,11 +38,11 @@ class AdminController {
         $consulta .= " LEFT OUTER JOIN peluqueros ";
         $consulta .= " ON turnos.peluquero_id = peluqueros.id ";
 
-        $consulta .= " LEFT OUTER JOIN turnosServicios ";
-        $consulta .= " ON turnosServicios.turno_id = turnos.id ";
+        $consulta .= " LEFT OUTER JOIN turnosservicios ";
+        $consulta .= " ON turnosservicios.turno_id = turnos.id ";
         
         $consulta .= " LEFT OUTER JOIN servicios ";
-        $consulta .= " ON servicios.id = turnosServicios.servicio_id ";
+        $consulta .= " ON servicios.id = turnosservicios.servicio_id ";
 
         $consulta .= " WHERE turnos.fecha = '{$fecha}' ";
 

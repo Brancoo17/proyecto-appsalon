@@ -163,8 +163,8 @@ class PeluqueroController {
         $consulta .= " FROM turnos ";
         $consulta .= " LEFT OUTER JOIN usuarios ON turnos.usuario_id = usuarios.id ";
         $consulta .= " LEFT OUTER JOIN peluqueros ON turnos.peluquero_id = peluqueros.id ";
-        $consulta .= " LEFT OUTER JOIN turnosServicios ON turnosServicios.turno_id = turnos.id ";
-        $consulta .= " LEFT OUTER JOIN servicios ON servicios.id = turnosServicios.servicio_id ";
+        $consulta .= " LEFT OUTER JOIN turnosservicios ON turnosservicios.turno_id = turnos.id ";
+        $consulta .= " LEFT OUTER JOIN servicios ON servicios.id = turnosservicios.servicio_id ";
         $consulta .= " WHERE turnos.fecha = '{$fecha}' AND turnos.peluquero_id = " . intval($peluqueroId) . " ";
 
         $turnos = AdminTurno::SQL($consulta);

@@ -106,7 +106,7 @@ $router->get('/diagnostico', function() {
 
     // Columnas clave
     echo "<h3 style='color:#38bdf8; margin-top:25px;'>2. Estructura de Tablas Críticas:</h3>";
-    foreach(['turnos', 'servicios', 'usuarios', 'peluqueros', 'turnosServicios'] as $t) {
+    foreach(['turnos', 'servicios', 'usuarios', 'peluqueros', 'turnosservicios'] as $t) {
         $existe = in_array($t, $tablas);
         if($existe) {
             echo "<h4 style='color:#a5b4fc; margin-bottom:5px;'>Tabla: <code>$t</code></h4><ul style='columns: 2; margin-top:0;'>";
@@ -134,8 +134,8 @@ $router->get('/diagnostico', function() {
                  FROM turnos
                  LEFT OUTER JOIN usuarios ON turnos.usuario_id = usuarios.id
                  LEFT OUTER JOIN peluqueros ON turnos.peluquero_id = peluqueros.id
-                 LEFT OUTER JOIN turnosServicios ON turnosServicios.turno_id = turnos.id
-                 LEFT OUTER JOIN servicios ON servicios.id = turnosServicios.servicio_id
+                 LEFT OUTER JOIN turnosservicios ON turnosservicios.turno_id = turnos.id
+                 LEFT OUTER JOIN servicios ON servicios.id = turnosservicios.servicio_id
                  WHERE turnos.fecha = '{$fecha}'";
     $testQ = $db->query($consulta);
     if($testQ) {

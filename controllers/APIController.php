@@ -119,8 +119,8 @@ class APIController {
         $queryTurnos = "SELECT turnos.id, turnos.hora, turnos.peluquero_id, ";
         $queryTurnos .= "COALESCE(SUM(servicios.duracion), 30) as duracion ";
         $queryTurnos .= "FROM turnos ";
-        $queryTurnos .= "LEFT JOIN turnosServicios ON turnosServicios.turno_id = turnos.id ";
-        $queryTurnos .= "LEFT JOIN servicios ON servicios.id = turnosServicios.servicio_id ";
+        $queryTurnos .= "LEFT JOIN turnosservicios ON turnosservicios.turno_id = turnos.id ";
+        $queryTurnos .= "LEFT JOIN servicios ON servicios.id = turnosservicios.servicio_id ";
         $queryTurnos .= "WHERE turnos.fecha = '{$fecha}' AND (turnos.estado != 'cancelado' OR turnos.estado IS NULL) ";
         $queryTurnos .= "GROUP BY turnos.id, turnos.hora, turnos.peluquero_id";
         

@@ -43,8 +43,8 @@ class UsuarioController {
             $queryTurnos .= "servicios.nombre as servicio, servicios.precio, COALESCE(servicios.duracion, 30) as duracion, ";
             $queryTurnos .= "CONCAT(peluqueros.nombre, ' ', peluqueros.apellido) as peluquero ";
             $queryTurnos .= "FROM turnos ";
-            $queryTurnos .= "LEFT JOIN turnosServicios ON turnosServicios.turno_id = turnos.id ";
-            $queryTurnos .= "LEFT JOIN servicios ON servicios.id = turnosServicios.servicio_id ";
+            $queryTurnos .= "LEFT JOIN turnosservicios ON turnosservicios.turno_id = turnos.id ";
+            $queryTurnos .= "LEFT JOIN servicios ON servicios.id = turnosservicios.servicio_id ";
             $queryTurnos .= "LEFT JOIN peluqueros ON peluqueros.id = turnos.peluquero_id ";
             $queryTurnos .= "WHERE turnos.usuario_id = {$usuarioId} ";
             $queryTurnos .= "ORDER BY turnos.fecha DESC, turnos.hora DESC";

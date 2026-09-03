@@ -3,7 +3,7 @@
 namespace Model;
 
 class AdminTurno extends ActiveRecord {
-    protected static string $tabla = 'turnosServicios';
+    protected static string $tabla = 'turnosservicios';
     protected static array $columnasDB = ['id', 'hora', 'cliente', 'email', 'telefono', 'servicio', 'precio', 'duracion', 'peluquero', 'estado', 'metodo_pago'];
 
     public ?int $id = null;
