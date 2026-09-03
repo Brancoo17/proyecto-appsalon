@@ -117,7 +117,7 @@ El sistema utiliza las siguientes tablas relacionales:
 2. **`peluqueros`**: Almacena los profesionales del staff con credenciales de acceso.
 3. **`servicios`**: Catálogo de servicios con nombre, precio y `duracion` (en minutos).
 4. **`turnos`**: Registros de turnos agendados con fecha, hora, método de pago y estado.
-5. **`turnosServicios`**: Tabla intermedia entre turnos y servicios (relación muchos a muchos).
+5. **`turnosservicios`**: Tabla intermedia entre turnos y servicios (relación muchos a muchos).
 6. **`peluqueros_servicios`**: Tabla intermedia de servicios asignados a cada peluquero.
 7. **`peluqueros_horarios`**: Horarios de trabajo semanales por día (1 = Lunes, ..., 6 = Sábado) de cada peluquero.
 
