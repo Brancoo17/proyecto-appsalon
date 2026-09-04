@@ -106,8 +106,9 @@
 </div>
 
 <?php
+    $vJs = file_exists(__DIR__ . '/../../public/build/js/app.js') ? filemtime(__DIR__ . '/../../public/build/js/app.js') : '2.0';
     $script = "
         <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
-        <script src='/build/js/app.js'></script>
+        <script src='/build/js/app.js?v={$vJs}'></script>
     ";
 ?>

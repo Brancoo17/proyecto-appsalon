@@ -118,7 +118,7 @@
             <input type="hidden" id="id" value="<?php echo s($turno->usuario_id ?? ''); ?>" />
             <input type="hidden" id="es_cliente" value="<?php echo $esCliente ? '1' : '0'; ?>" />
             <input type="hidden" id="turno_id_modificar" value="<?php echo s($turno->id); ?>" />
-            <input type="hidden" id="turno_modificar_servicios" value='<?php echo json_encode($serviciosAsignadosIds); ?>' />
+            <input type="hidden" id="turno_modificar_servicios" value="<?php echo htmlspecialchars(json_encode($serviciosAsignadosIds), ENT_QUOTES, 'UTF-8'); ?>" />
             <input type="hidden" id="turno_modificar_fecha" value="<?php echo s($turno->fecha); ?>" />
             <input type="hidden" id="turno_modificar_hora" value="<?php echo s(substr($turno->hora, 0, 5)); ?>" />
             <input type="hidden" id="turno_modificar_peluquero_id" value="<?php echo s($turno->peluquero_id); ?>" />
@@ -139,8 +139,9 @@
 </div>
 
 <?php
+    $vJs = file_exists(__DIR__ . '/../../public/build/js/app.js') ? filemtime(__DIR__ . '/../../public/build/js/app.js') : '2.0';
     $script = "
         <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
-        <script src='/build/js/app.js'></script>
+        <script src='/build/js/app.js?v={$vJs}'></script>
     ";
 ?>

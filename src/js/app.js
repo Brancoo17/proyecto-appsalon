@@ -907,11 +907,16 @@ async function reservarTurno() {
 
 async function precargarDatosModificacion(servicios, peluqueros) {
     const inputServicios = document.querySelector('#turno_modificar_servicios');
-    const idsServicios = inputServicios ? JSON.parse(inputServicios.value || '[]') : [];
+    let idsServicios = [];
+    try {
+        idsServicios = (inputServicios ? JSON.parse(inputServicios.value || '[]') : []).map(Number);
+    } catch(e) {
+        idsServicios = [];
+    }
 
     if(Array.isArray(idsServicios) && idsServicios.length > 0) {
         servicios.forEach(servicio => {
-            if(idsServicios.includes(parseInt(servicio.id))) {
+            if(idsServicios.includes(Number(servicio.id))) {
                 turno.servicios.push(servicio);
                 const divServicio = document.querySelector(`[data-id-servicio="${servicio.id}"]`);
                 if(divServicio) divServicio.classList.add('seleccionado');
@@ -937,17 +942,18 @@ async function precargarDatosModificacion(servicios, peluqueros) {
         turno.fecha = fechaPrev;
         if(inputFecha) inputFecha.value = fechaPrev;
 
-        if(horaPrev) {
-            turno.hora = horaPrev;
-            if(inputHora) inputHora.value = horaPrev;
+        const horaLimpia = (horaPrev || '').substring(0, 5);
+        if(horaLimpia) {
+            turno.hora = horaLimpia;
+            if(inputHora) inputHora.value = horaLimpia;
         }
 
         await obtenerHorasDisponiblesDia(fechaPrev);
 
-        if(horaPrev) {
+        if(horaLimpia) {
             const botones = document.querySelectorAll('.hora-boton');
             botones.forEach(b => {
-                if(b.textContent.trim() === horaPrev) {
+                if(b.textContent.trim().substring(0, 5) === horaLimpia) {
                     b.classList.add('seleccionada');
                     b.disabled = false;
                     b.classList.remove('ocupada');
@@ -955,7 +961,7 @@ async function precargarDatosModificacion(servicios, peluqueros) {
             });
 
             if(peluqueroIdPrev && peluqueros && peluqueros.length > 0) {
-                const peluqueroEncontrado = peluqueros.find(p => String(p.id) === String(peluqueroIdPrev));
+                const peluqueroEncontrado = peluqueros.find(p => Number(p.id) === Number(peluqueroIdPrev));
                 if(peluqueroEncontrado) {
                     turno.peluquero = {
                         id: peluqueroEncontrado.id,
@@ -971,6 +977,8 @@ async function precargarDatosModificacion(servicios, peluqueros) {
             }
         }
     }
+
+    mostrarResumen();
 }
 
 async function guardarCambiosTurno() {
