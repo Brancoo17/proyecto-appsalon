@@ -272,97 +272,98 @@ function buscadorClientes() {
 }
 
 function modalVerTurnosCliente() {
-    const botones = document.querySelectorAll('.btn-ver-turnos-cliente');
-    botones.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const nombre = this.dataset.nombre || 'Cliente';
-            let turnos = [];
-            try {
-                turnos = JSON.parse(this.dataset.turnos || '[]');
-            } catch (e) {
-                turnos = [];
-            }
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-ver-turnos-cliente');
+        if(!btn) return;
 
-            let html = `<div class="modal-info-listado modal-turnos-cliente">`;
-            if (turnos.length === 0) {
-                html += `<p class="alerta-vacio-modal"><i class="fa-solid fa-calendar-xmark"></i> Este cliente no tiene turnos registrados.</p>`;
-            } else {
-                html += `<div class="lista-turnos-modal">`;
-                turnos.forEach(t => {
-                    const estado = (t.estado || 'reservado').toLowerCase();
+        const nombre = btn.dataset.nombre || 'Cliente';
+        let turnos = [];
+        try {
+            turnos = JSON.parse(btn.dataset.turnos || '[]');
+        } catch (e) {
+            console.error('Error parseando turnos:', e);
+            turnos = [];
+        }
 
-                    // Formato de fecha dd/mm/yy (año de 2 dígitos)
-                    let fechaFormateada = '';
-                    if (t.fecha) {
-                        const partes = t.fecha.split('-');
-                        if (partes.length === 3) {
-                            const anioCorto = partes[0].length === 4 ? partes[0].slice(2) : partes[0];
-                            fechaFormateada = `${partes[2]}/${partes[1]}/${anioCorto}`;
-                        } else {
-                            fechaFormateada = t.fecha;
-                        }
-                    }
+        let html = `<div class="modal-info-listado modal-turnos-cliente">`;
+        if (turnos.length === 0) {
+            html += `<p class="alerta-vacio-modal"><i class="fa-solid fa-calendar-xmark"></i> Este cliente no tiene turnos registrados.</p>`;
+        } else {
+            html += `<div class="lista-turnos-modal">`;
+            turnos.forEach(t => {
+                const estado = (t.estado || 'reservado').toLowerCase();
 
-                    let estadoBadge = `<span class="badge-estado badge-estado--${estado}">${estado.charAt(0).toUpperCase() + estado.slice(1)}</span>`;
-
-                    // Generar chips individuales para cada servicio
-                    let serviciosChipsHtml = '';
-                    if (t.servicios && t.servicios.length > 0) {
-                        serviciosChipsHtml = t.servicios.map(s => `
-                            <span class="chip-servicio-modal">
-                                <i class="fa-solid fa-scissors"></i> ${s}
-                            </span>
-                        `).join('');
+                // Formato de fecha dd/mm/yy (año de 2 dígitos)
+                let fechaFormateada = '';
+                if (t.fecha) {
+                    const partes = t.fecha.split('-');
+                    if (partes.length === 3) {
+                        const anioCorto = partes[0].length === 4 ? partes[0].slice(2) : partes[0];
+                        fechaFormateada = `${partes[2]}/${partes[1]}/${anioCorto}`;
                     } else {
-                        serviciosChipsHtml = `<span class="chip-servicio-modal"><i class="fa-solid fa-scissors"></i> Servicio general</span>`;
+                        fechaFormateada = t.fecha;
                     }
+                }
 
-                    html += `
-                        <div class="item-turno-modal">
-                            <div class="header-turno-modal">
-                                <div class="fecha-hora-modal">
-                                    <span class="badge-fecha-item">
-                                        <i class="fa-regular fa-calendar"></i> ${fechaFormateada}
-                                    </span>
-                                    <span class="badge-hora-item">
-                                        <i class="fa-regular fa-clock"></i> ${t.hora} hs
-                                    </span>
-                                </div>
-                                ${estadoBadge}
+                let estadoBadge = `<span class="badge-estado badge-estado--${estado}">${estado.charAt(0).toUpperCase() + estado.slice(1)}</span>`;
+
+                // Generar chips individuales para cada servicio
+                let serviciosChipsHtml = '';
+                if (t.servicios && t.servicios.length > 0) {
+                    serviciosChipsHtml = t.servicios.map(s => `
+                        <span class="chip-servicio-modal">
+                            <i class="fa-solid fa-scissors"></i> ${s}
+                        </span>
+                    `).join('');
+                } else {
+                    serviciosChipsHtml = `<span class="chip-servicio-modal"><i class="fa-solid fa-scissors"></i> Servicio general</span>`;
+                }
+
+                html += `
+                    <div class="item-turno-modal">
+                        <div class="header-turno-modal">
+                            <div class="fecha-hora-modal">
+                                <span class="badge-fecha-item">
+                                    <i class="fa-regular fa-calendar"></i> ${fechaFormateada}
+                                </span>
+                                <span class="badge-hora-item">
+                                    <i class="fa-regular fa-clock"></i> ${t.hora} hs
+                                </span>
                             </div>
+                            ${estadoBadge}
+                        </div>
 
-                            <div class="seccion-servicios-modal">
-                                <span class="label-seccion-servicios">Servicios:</span>
-                                <div class="tags-servicios-modal">
-                                    ${serviciosChipsHtml}
-                                </div>
-                            </div>
-
-                            <div class="footer-turno-modal">
-                                <div class="col-barbero-modal">
-                                    <span class="label-mini"><i class="fa-solid fa-user-tie"></i> Barbero:</span>
-                                    <strong class="nombre-barbero">${t.peluquero || 'No asignado'}</strong>
-                                </div>
-                                <div class="col-total-modal">
-                                    <span class="label-mini">Total:</span>
-                                    <strong class="monto-total">$${parseFloat(t.total || 0).toLocaleString('es-AR')}</strong>
-                                </div>
+                        <div class="seccion-servicios-modal">
+                            <span class="label-seccion-servicios">Servicios:</span>
+                            <div class="tags-servicios-modal">
+                                ${serviciosChipsHtml}
                             </div>
                         </div>
-                    `;
-                });
-                html += `</div>`;
-            }
-            html += `</div>`;
 
-            Swal.fire({
-                title: `📋 Turnos de ${nombre}`,
-                html: html,
-                width: '640px',
-                confirmButtonText: 'Cerrar',
-                confirmButtonColor: '#0da6f3',
-                customClass: { popup: 'mi-alerta alerta-info-turnos-modal' }
+                        <div class="footer-turno-modal">
+                            <div class="col-barbero-modal">
+                                <span class="label-mini"><i class="fa-solid fa-user-tie"></i> Barbero:</span>
+                                <strong class="nombre-barbero">${t.peluquero || 'No asignado'}</strong>
+                            </div>
+                            <div class="col-total-modal">
+                                <span class="label-mini">Total:</span>
+                                <strong class="monto-total">$${parseFloat(t.total || 0).toLocaleString('es-AR')}</strong>
+                            </div>
+                        </div>
+                    </div>
+                `;
             });
+            html += `</div>`;
+        }
+        html += `</div>`;
+
+        Swal.fire({
+            title: `📋 Turnos de ${nombre}`,
+            html: html,
+            width: '640px',
+            confirmButtonText: 'Cerrar',
+            confirmButtonColor: '#0da6f3',
+            customClass: { popup: 'mi-alerta alerta-info-turnos-modal' }
         });
     });
 }

@@ -13,7 +13,8 @@
     <title><?php echo $titulo ?? 'BarberShop'; ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> 
-    <link rel="stylesheet" href="/build/css/app.css">
+    <?php $vCss = file_exists(__DIR__ . '/../public/build/css/app.css') ? filemtime(__DIR__ . '/../public/build/css/app.css') : '2.0'; ?>
+    <link rel="stylesheet" href="/build/css/app.css?v=<?php echo $vCss; ?>">
 </head>
 <body class="<?php echo isset($is_home) && $is_home ? 'home-body' : ''; ?>">
 

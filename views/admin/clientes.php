@@ -158,7 +158,7 @@
                             <?php if($totalTurnos > 0): ?>
                                 <button type="button" class="btn-tabla-modal btn-ver-turnos-cliente" 
                                         data-nombre="<?php echo s($nombreCompleto); ?>"
-                                        data-turnos='<?php echo json_encode($turnosList, JSON_HEX_APOS | JSON_HEX_QUOT); ?>'
+                                        data-turnos="<?php echo htmlspecialchars(json_encode($turnosList), ENT_QUOTES, 'UTF-8'); ?>"
                                         title="Ver Historial de Turnos">
                                     <i class="fa-solid fa-list-check"></i> Ver Turnos
                                 </button>
@@ -178,8 +178,9 @@
 <?php endif; ?>
 
 <?php
+    $vJs = file_exists(__DIR__ . '/../../public/build/js/buscador.js') ? filemtime(__DIR__ . '/../../public/build/js/buscador.js') : '2.0';
     $script = "
         <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
-        <script src='/build/js/buscador.js'></script>
+        <script src='/build/js/buscador.js?v={$vJs}'></script>
     ";
 ?>

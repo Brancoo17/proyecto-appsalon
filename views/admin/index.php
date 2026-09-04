@@ -215,8 +215,9 @@
 </div>
 
 <?php
+    $vJs = file_exists(__DIR__ . '/../../public/build/js/buscador.js') ? filemtime(__DIR__ . '/../../public/build/js/buscador.js') : '2.0';
     $script = "
         <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
-        <script src='/build/js/buscador.js'></script>
+        <script src='/build/js/buscador.js?v={$vJs}'></script>
     ";
 ?>
